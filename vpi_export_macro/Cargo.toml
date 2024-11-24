@@ -2,6 +2,8 @@
 name = "vpi_export_macro"
 version = "0.1.0"
 edition = "2021"
+license = "MIT"
+description = "proc-macro for vpi_export"
 
 [lib]
 proc-macro = true
