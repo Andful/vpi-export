@@ -1,0 +1,3 @@
+[submodule "vpi_export/iverilog"]
+	path = vpi_export/iverilog
+	url = https://github.com/steveicarus/iverilog.git

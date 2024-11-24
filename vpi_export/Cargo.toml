@@ -1,0 +1,15 @@
+[package]
+name = "vpi_export"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+ctor = "0.2.9"
+proc-macro2 = "1.0.92"
+vpi_export_macro = { "path" = "../vpi_export_macro" }
+
+[dev-dependencies]
+trybuild = "1.0.101"
+
+[build-dependencies]
+bindgen = "0.70.1"

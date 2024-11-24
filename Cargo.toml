@@ -1,0 +1,3 @@
+[workspace]
+members = [ "vpi_example","vpi_export", "vpi_export_macro"]
+resolver = "2"
