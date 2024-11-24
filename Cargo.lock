@@ -378,12 +378,23 @@ dependencies = [
  "ctor",
  "proc-macro2",
  "trybuild",
- "vpi_export_macro",
+ "vpi_export_macro 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
 name = "vpi_export_macro"
 version = "0.1.0"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
+name = "vpi_export_macro"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6149402bf76afcb46f6542ee786ed8ddf202cd15b14df5e4a8802fb30abe5003"
 dependencies = [
  "proc-macro2",
  "quote",
