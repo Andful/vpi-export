@@ -486,18 +486,18 @@ pub const _vpi_at_A: u32 = 5;
 pub const _vpi_at_APV: u32 = 6;
 pub type va_list = __builtin_va_list;
 pub type __gnuc_va_list = __builtin_va_list;
-pub type __u_char = ::std::os::raw::c_uchar;
-pub type __u_short = ::std::os::raw::c_ushort;
-pub type __u_int = ::std::os::raw::c_uint;
-pub type __u_long = ::std::os::raw::c_ulong;
-pub type __int8_t = ::std::os::raw::c_schar;
-pub type __uint8_t = ::std::os::raw::c_uchar;
-pub type __int16_t = ::std::os::raw::c_short;
-pub type __uint16_t = ::std::os::raw::c_ushort;
-pub type __int32_t = ::std::os::raw::c_int;
-pub type __uint32_t = ::std::os::raw::c_uint;
-pub type __int64_t = ::std::os::raw::c_long;
-pub type __uint64_t = ::std::os::raw::c_ulong;
+pub type __u_char = ::core::ffi::c_uchar;
+pub type __u_short = ::core::ffi::c_ushort;
+pub type __u_int = ::core::ffi::c_uint;
+pub type __u_long = ::core::ffi::c_ulong;
+pub type __int8_t = ::core::ffi::c_schar;
+pub type __uint8_t = ::core::ffi::c_uchar;
+pub type __int16_t = ::core::ffi::c_short;
+pub type __uint16_t = ::core::ffi::c_ushort;
+pub type __int32_t = ::core::ffi::c_int;
+pub type __uint32_t = ::core::ffi::c_uint;
+pub type __int64_t = ::core::ffi::c_long;
+pub type __uint64_t = ::core::ffi::c_ulong;
 pub type __int_least8_t = __int8_t;
 pub type __uint_least8_t = __uint8_t;
 pub type __int_least16_t = __int16_t;
@@ -506,78 +506,78 @@ pub type __int_least32_t = __int32_t;
 pub type __uint_least32_t = __uint32_t;
 pub type __int_least64_t = __int64_t;
 pub type __uint_least64_t = __uint64_t;
-pub type __quad_t = ::std::os::raw::c_long;
-pub type __u_quad_t = ::std::os::raw::c_ulong;
-pub type __intmax_t = ::std::os::raw::c_long;
-pub type __uintmax_t = ::std::os::raw::c_ulong;
-pub type __dev_t = ::std::os::raw::c_ulong;
-pub type __uid_t = ::std::os::raw::c_uint;
-pub type __gid_t = ::std::os::raw::c_uint;
-pub type __ino_t = ::std::os::raw::c_ulong;
-pub type __ino64_t = ::std::os::raw::c_ulong;
-pub type __mode_t = ::std::os::raw::c_uint;
-pub type __nlink_t = ::std::os::raw::c_ulong;
-pub type __off_t = ::std::os::raw::c_long;
-pub type __off64_t = ::std::os::raw::c_long;
-pub type __pid_t = ::std::os::raw::c_int;
+pub type __quad_t = ::core::ffi::c_long;
+pub type __u_quad_t = ::core::ffi::c_ulong;
+pub type __intmax_t = ::core::ffi::c_long;
+pub type __uintmax_t = ::core::ffi::c_ulong;
+pub type __dev_t = ::core::ffi::c_ulong;
+pub type __uid_t = ::core::ffi::c_uint;
+pub type __gid_t = ::core::ffi::c_uint;
+pub type __ino_t = ::core::ffi::c_ulong;
+pub type __ino64_t = ::core::ffi::c_ulong;
+pub type __mode_t = ::core::ffi::c_uint;
+pub type __nlink_t = ::core::ffi::c_ulong;
+pub type __off_t = ::core::ffi::c_long;
+pub type __off64_t = ::core::ffi::c_long;
+pub type __pid_t = ::core::ffi::c_int;
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct __fsid_t {
-    pub __val: [::std::os::raw::c_int; 2usize],
+    pub __val: [::core::ffi::c_int; 2usize],
 }
-pub type __clock_t = ::std::os::raw::c_long;
-pub type __rlim_t = ::std::os::raw::c_ulong;
-pub type __rlim64_t = ::std::os::raw::c_ulong;
-pub type __id_t = ::std::os::raw::c_uint;
-pub type __time_t = ::std::os::raw::c_long;
-pub type __useconds_t = ::std::os::raw::c_uint;
-pub type __suseconds_t = ::std::os::raw::c_long;
-pub type __daddr_t = ::std::os::raw::c_int;
-pub type __key_t = ::std::os::raw::c_int;
-pub type __clockid_t = ::std::os::raw::c_int;
-pub type __timer_t = *mut ::std::os::raw::c_void;
-pub type __blksize_t = ::std::os::raw::c_long;
-pub type __blkcnt_t = ::std::os::raw::c_long;
-pub type __blkcnt64_t = ::std::os::raw::c_long;
-pub type __fsblkcnt_t = ::std::os::raw::c_ulong;
-pub type __fsblkcnt64_t = ::std::os::raw::c_ulong;
-pub type __fsfilcnt_t = ::std::os::raw::c_ulong;
-pub type __fsfilcnt64_t = ::std::os::raw::c_ulong;
-pub type __fsword_t = ::std::os::raw::c_long;
-pub type __ssize_t = ::std::os::raw::c_long;
-pub type __syscall_slong_t = ::std::os::raw::c_long;
-pub type __syscall_ulong_t = ::std::os::raw::c_ulong;
+pub type __clock_t = ::core::ffi::c_long;
+pub type __rlim_t = ::core::ffi::c_ulong;
+pub type __rlim64_t = ::core::ffi::c_ulong;
+pub type __id_t = ::core::ffi::c_uint;
+pub type __time_t = ::core::ffi::c_long;
+pub type __useconds_t = ::core::ffi::c_uint;
+pub type __suseconds_t = ::core::ffi::c_long;
+pub type __daddr_t = ::core::ffi::c_int;
+pub type __key_t = ::core::ffi::c_int;
+pub type __clockid_t = ::core::ffi::c_int;
+pub type __timer_t = *mut ::core::ffi::c_void;
+pub type __blksize_t = ::core::ffi::c_long;
+pub type __blkcnt_t = ::core::ffi::c_long;
+pub type __blkcnt64_t = ::core::ffi::c_long;
+pub type __fsblkcnt_t = ::core::ffi::c_ulong;
+pub type __fsblkcnt64_t = ::core::ffi::c_ulong;
+pub type __fsfilcnt_t = ::core::ffi::c_ulong;
+pub type __fsfilcnt64_t = ::core::ffi::c_ulong;
+pub type __fsword_t = ::core::ffi::c_long;
+pub type __ssize_t = ::core::ffi::c_long;
+pub type __syscall_slong_t = ::core::ffi::c_long;
+pub type __syscall_ulong_t = ::core::ffi::c_ulong;
 pub type __loff_t = __off64_t;
-pub type __caddr_t = *mut ::std::os::raw::c_char;
-pub type __intptr_t = ::std::os::raw::c_long;
-pub type __socklen_t = ::std::os::raw::c_uint;
-pub type __sig_atomic_t = ::std::os::raw::c_int;
+pub type __caddr_t = *mut ::core::ffi::c_char;
+pub type __intptr_t = ::core::ffi::c_long;
+pub type __socklen_t = ::core::ffi::c_uint;
+pub type __sig_atomic_t = ::core::ffi::c_int;
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct __mbstate_t {
-    pub __count: ::std::os::raw::c_int,
+    pub __count: ::core::ffi::c_int,
     pub __value: __mbstate_t__bindgen_ty_1,
 }
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub union __mbstate_t__bindgen_ty_1 {
-    pub __wch: ::std::os::raw::c_uint,
-    pub __wchb: [::std::os::raw::c_char; 4usize],
+    pub __wch: ::core::ffi::c_uint,
+    pub __wchb: [::core::ffi::c_char; 4usize],
 }
 impl Default for __mbstate_t__bindgen_ty_1 {
     fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
     }
 }
 impl Default for __mbstate_t {
     fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
     }
@@ -590,9 +590,9 @@ pub struct _G_fpos_t {
 }
 impl Default for _G_fpos_t {
     fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
     }
@@ -606,9 +606,9 @@ pub struct _G_fpos64_t {
 }
 impl Default for _G_fpos64_t {
     fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
     }
@@ -631,45 +631,45 @@ pub struct _IO_codecvt {
 pub struct _IO_wide_data {
     _unused: [u8; 0],
 }
-pub type _IO_lock_t = ::std::os::raw::c_void;
+pub type _IO_lock_t = ::core::ffi::c_void;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct _IO_FILE {
-    pub _flags: ::std::os::raw::c_int,
-    pub _IO_read_ptr: *mut ::std::os::raw::c_char,
-    pub _IO_read_end: *mut ::std::os::raw::c_char,
-    pub _IO_read_base: *mut ::std::os::raw::c_char,
-    pub _IO_write_base: *mut ::std::os::raw::c_char,
-    pub _IO_write_ptr: *mut ::std::os::raw::c_char,
-    pub _IO_write_end: *mut ::std::os::raw::c_char,
-    pub _IO_buf_base: *mut ::std::os::raw::c_char,
-    pub _IO_buf_end: *mut ::std::os::raw::c_char,
-    pub _IO_save_base: *mut ::std::os::raw::c_char,
-    pub _IO_backup_base: *mut ::std::os::raw::c_char,
-    pub _IO_save_end: *mut ::std::os::raw::c_char,
+    pub _flags: ::core::ffi::c_int,
+    pub _IO_read_ptr: *mut ::core::ffi::c_char,
+    pub _IO_read_end: *mut ::core::ffi::c_char,
+    pub _IO_read_base: *mut ::core::ffi::c_char,
+    pub _IO_write_base: *mut ::core::ffi::c_char,
+    pub _IO_write_ptr: *mut ::core::ffi::c_char,
+    pub _IO_write_end: *mut ::core::ffi::c_char,
+    pub _IO_buf_base: *mut ::core::ffi::c_char,
+    pub _IO_buf_end: *mut ::core::ffi::c_char,
+    pub _IO_save_base: *mut ::core::ffi::c_char,
+    pub _IO_backup_base: *mut ::core::ffi::c_char,
+    pub _IO_save_end: *mut ::core::ffi::c_char,
     pub _markers: *mut _IO_marker,
     pub _chain: *mut _IO_FILE,
-    pub _fileno: ::std::os::raw::c_int,
-    pub _flags2: ::std::os::raw::c_int,
+    pub _fileno: ::core::ffi::c_int,
+    pub _flags2: ::core::ffi::c_int,
     pub _old_offset: __off_t,
-    pub _cur_column: ::std::os::raw::c_ushort,
-    pub _vtable_offset: ::std::os::raw::c_schar,
-    pub _shortbuf: [::std::os::raw::c_char; 1usize],
+    pub _cur_column: ::core::ffi::c_ushort,
+    pub _vtable_offset: ::core::ffi::c_schar,
+    pub _shortbuf: [::core::ffi::c_char; 1usize],
     pub _lock: *mut _IO_lock_t,
     pub _offset: __off64_t,
     pub _codecvt: *mut _IO_codecvt,
     pub _wide_data: *mut _IO_wide_data,
     pub _freeres_list: *mut _IO_FILE,
-    pub _freeres_buf: *mut ::std::os::raw::c_void,
+    pub _freeres_buf: *mut ::core::ffi::c_void,
     pub __pad5: usize,
-    pub _mode: ::std::os::raw::c_int,
-    pub _unused2: [::std::os::raw::c_char; 20usize],
+    pub _mode: ::core::ffi::c_int,
+    pub _unused2: [::core::ffi::c_char; 20usize],
 }
 impl Default for _IO_FILE {
     fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
     }
@@ -686,89 +686,88 @@ extern "C" {
     pub static mut stderr: *mut FILE;
 }
 extern "C" {
-    pub fn remove(__filename: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
+    pub fn remove(__filename: *const ::core::ffi::c_char) -> ::core::ffi::c_int;
 }
 extern "C" {
     pub fn rename(
-        __old: *const ::std::os::raw::c_char,
-        __new: *const ::std::os::raw::c_char,
-    ) -> ::std::os::raw::c_int;
+        __old: *const ::core::ffi::c_char,
+        __new: *const ::core::ffi::c_char,
+    ) -> ::core::ffi::c_int;
 }
 extern "C" {
     pub fn renameat(
-        __oldfd: ::std::os::raw::c_int,
-        __old: *const ::std::os::raw::c_char,
-        __newfd: ::std::os::raw::c_int,
-        __new: *const ::std::os::raw::c_char,
-    ) -> ::std::os::raw::c_int;
+        __oldfd: ::core::ffi::c_int,
+        __old: *const ::core::ffi::c_char,
+        __newfd: ::core::ffi::c_int,
+        __new: *const ::core::ffi::c_char,
+    ) -> ::core::ffi::c_int;
 }
 extern "C" {
     pub fn tmpfile() -> *mut FILE;
 }
 extern "C" {
-    pub fn tmpnam(__s: *mut ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char;
+    pub fn tmpnam(__s: *mut ::core::ffi::c_char) -> *mut ::core::ffi::c_char;
 }
 extern "C" {
-    pub fn tmpnam_r(__s: *mut ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char;
+    pub fn tmpnam_r(__s: *mut ::core::ffi::c_char) -> *mut ::core::ffi::c_char;
 }
 extern "C" {
     pub fn tempnam(
-        __dir: *const ::std::os::raw::c_char,
-        __pfx: *const ::std::os::raw::c_char,
-    ) -> *mut ::std::os::raw::c_char;
+        __dir: *const ::core::ffi::c_char,
+        __pfx: *const ::core::ffi::c_char,
+    ) -> *mut ::core::ffi::c_char;
 }
 extern "C" {
-    pub fn fclose(__stream: *mut FILE) -> ::std::os::raw::c_int;
+    pub fn fclose(__stream: *mut FILE) -> ::core::ffi::c_int;
 }
 extern "C" {
-    pub fn fflush(__stream: *mut FILE) -> ::std::os::raw::c_int;
+    pub fn fflush(__stream: *mut FILE) -> ::core::ffi::c_int;
 }
 extern "C" {
-    pub fn fflush_unlocked(__stream: *mut FILE) -> ::std::os::raw::c_int;
+    pub fn fflush_unlocked(__stream: *mut FILE) -> ::core::ffi::c_int;
 }
 extern "C" {
     pub fn fopen(
-        __filename: *const ::std::os::raw::c_char,
-        __modes: *const ::std::os::raw::c_char,
+        __filename: *const ::core::ffi::c_char,
+        __modes: *const ::core::ffi::c_char,
     ) -> *mut FILE;
 }
 extern "C" {
     pub fn freopen(
-        __filename: *const ::std::os::raw::c_char,
-        __modes: *const ::std::os::raw::c_char,
+        __filename: *const ::core::ffi::c_char,
+        __modes: *const ::core::ffi::c_char,
         __stream: *mut FILE,
     ) -> *mut FILE;
 }
 extern "C" {
-    pub fn fdopen(__fd: ::std::os::raw::c_int, __modes: *const ::std::os::raw::c_char)
-        -> *mut FILE;
+    pub fn fdopen(__fd: ::core::ffi::c_int, __modes: *const ::core::ffi::c_char) -> *mut FILE;
 }
 extern "C" {
     pub fn fmemopen(
-        __s: *mut ::std::os::raw::c_void,
+        __s: *mut ::core::ffi::c_void,
         __len: usize,
-        __modes: *const ::std::os::raw::c_char,
+        __modes: *const ::core::ffi::c_char,
     ) -> *mut FILE;
 }
 extern "C" {
     pub fn open_memstream(
-        __bufloc: *mut *mut ::std::os::raw::c_char,
+        __bufloc: *mut *mut ::core::ffi::c_char,
         __sizeloc: *mut usize,
     ) -> *mut FILE;
 }
 extern "C" {
-    pub fn setbuf(__stream: *mut FILE, __buf: *mut ::std::os::raw::c_char);
+    pub fn setbuf(__stream: *mut FILE, __buf: *mut ::core::ffi::c_char);
 }
 extern "C" {
     pub fn setvbuf(
         __stream: *mut FILE,
-        __buf: *mut ::std::os::raw::c_char,
-        __modes: ::std::os::raw::c_int,
+        __buf: *mut ::core::ffi::c_char,
+        __modes: ::core::ffi::c_int,
         __n: usize,
-    ) -> ::std::os::raw::c_int;
+    ) -> ::core::ffi::c_int;
 }
 extern "C" {
-    pub fn setbuffer(__stream: *mut FILE, __buf: *mut ::std::os::raw::c_char, __size: usize);
+    pub fn setbuffer(__stream: *mut FILE, __buf: *mut ::core::ffi::c_char, __size: usize);
 }
 extern "C" {
     pub fn setlinebuf(__stream: *mut FILE);
@@ -776,251 +775,250 @@ extern "C" {
 extern "C" {
     pub fn fprintf(
         __stream: *mut FILE,
-        __format: *const ::std::os::raw::c_char,
+        __format: *const ::core::ffi::c_char,
         ...
-    ) -> ::std::os::raw::c_int;
+    ) -> ::core::ffi::c_int;
 }
 extern "C" {
-    pub fn printf(__format: *const ::std::os::raw::c_char, ...) -> ::std::os::raw::c_int;
+    pub fn printf(__format: *const ::core::ffi::c_char, ...) -> ::core::ffi::c_int;
 }
 extern "C" {
     pub fn sprintf(
-        __s: *mut ::std::os::raw::c_char,
-        __format: *const ::std::os::raw::c_char,
+        __s: *mut ::core::ffi::c_char,
+        __format: *const ::core::ffi::c_char,
         ...
-    ) -> ::std::os::raw::c_int;
+    ) -> ::core::ffi::c_int;
 }
 extern "C" {
     pub fn vfprintf(
         __s: *mut FILE,
-        __format: *const ::std::os::raw::c_char,
+        __format: *const ::core::ffi::c_char,
         __arg: *mut __va_list_tag,
-    ) -> ::std::os::raw::c_int;
+    ) -> ::core::ffi::c_int;
 }
 extern "C" {
     pub fn vprintf(
-        __format: *const ::std::os::raw::c_char,
+        __format: *const ::core::ffi::c_char,
         __arg: *mut __va_list_tag,
-    ) -> ::std::os::raw::c_int;
+    ) -> ::core::ffi::c_int;
 }
 extern "C" {
     pub fn vsprintf(
-        __s: *mut ::std::os::raw::c_char,
-        __format: *const ::std::os::raw::c_char,
+        __s: *mut ::core::ffi::c_char,
+        __format: *const ::core::ffi::c_char,
         __arg: *mut __va_list_tag,
-    ) -> ::std::os::raw::c_int;
+    ) -> ::core::ffi::c_int;
 }
 extern "C" {
     pub fn snprintf(
-        __s: *mut ::std::os::raw::c_char,
-        __maxlen: ::std::os::raw::c_ulong,
-        __format: *const ::std::os::raw::c_char,
+        __s: *mut ::core::ffi::c_char,
+        __maxlen: ::core::ffi::c_ulong,
+        __format: *const ::core::ffi::c_char,
         ...
-    ) -> ::std::os::raw::c_int;
+    ) -> ::core::ffi::c_int;
 }
 extern "C" {
     pub fn vsnprintf(
-        __s: *mut ::std::os::raw::c_char,
-        __maxlen: ::std::os::raw::c_ulong,
-        __format: *const ::std::os::raw::c_char,
+        __s: *mut ::core::ffi::c_char,
+        __maxlen: ::core::ffi::c_ulong,
+        __format: *const ::core::ffi::c_char,
         __arg: *mut __va_list_tag,
-    ) -> ::std::os::raw::c_int;
+    ) -> ::core::ffi::c_int;
 }
 extern "C" {
     pub fn vdprintf(
-        __fd: ::std::os::raw::c_int,
-        __fmt: *const ::std::os::raw::c_char,
+        __fd: ::core::ffi::c_int,
+        __fmt: *const ::core::ffi::c_char,
         __arg: *mut __va_list_tag,
-    ) -> ::std::os::raw::c_int;
+    ) -> ::core::ffi::c_int;
 }
 extern "C" {
     pub fn dprintf(
-        __fd: ::std::os::raw::c_int,
-        __fmt: *const ::std::os::raw::c_char,
+        __fd: ::core::ffi::c_int,
+        __fmt: *const ::core::ffi::c_char,
         ...
-    ) -> ::std::os::raw::c_int;
+    ) -> ::core::ffi::c_int;
 }
 extern "C" {
     pub fn fscanf(
         __stream: *mut FILE,
-        __format: *const ::std::os::raw::c_char,
+        __format: *const ::core::ffi::c_char,
         ...
-    ) -> ::std::os::raw::c_int;
+    ) -> ::core::ffi::c_int;
 }
 extern "C" {
-    pub fn scanf(__format: *const ::std::os::raw::c_char, ...) -> ::std::os::raw::c_int;
+    pub fn scanf(__format: *const ::core::ffi::c_char, ...) -> ::core::ffi::c_int;
 }
 extern "C" {
     pub fn sscanf(
-        __s: *const ::std::os::raw::c_char,
-        __format: *const ::std::os::raw::c_char,
+        __s: *const ::core::ffi::c_char,
+        __format: *const ::core::ffi::c_char,
         ...
-    ) -> ::std::os::raw::c_int;
+    ) -> ::core::ffi::c_int;
 }
 extern "C" {
     #[link_name = "\u{1}__isoc99_fscanf"]
     pub fn fscanf1(
         __stream: *mut FILE,
-        __format: *const ::std::os::raw::c_char,
+        __format: *const ::core::ffi::c_char,
         ...
-    ) -> ::std::os::raw::c_int;
+    ) -> ::core::ffi::c_int;
 }
 extern "C" {
     #[link_name = "\u{1}__isoc99_scanf"]
-    pub fn scanf1(__format: *const ::std::os::raw::c_char, ...) -> ::std::os::raw::c_int;
+    pub fn scanf1(__format: *const ::core::ffi::c_char, ...) -> ::core::ffi::c_int;
 }
 extern "C" {
     #[link_name = "\u{1}__isoc99_sscanf"]
     pub fn sscanf1(
-        __s: *const ::std::os::raw::c_char,
-        __format: *const ::std::os::raw::c_char,
+        __s: *const ::core::ffi::c_char,
+        __format: *const ::core::ffi::c_char,
         ...
-    ) -> ::std::os::raw::c_int;
+    ) -> ::core::ffi::c_int;
 }
 extern "C" {
     pub fn vfscanf(
         __s: *mut FILE,
-        __format: *const ::std::os::raw::c_char,
+        __format: *const ::core::ffi::c_char,
         __arg: *mut __va_list_tag,
-    ) -> ::std::os::raw::c_int;
+    ) -> ::core::ffi::c_int;
 }
 extern "C" {
     pub fn vscanf(
-        __format: *const ::std::os::raw::c_char,
+        __format: *const ::core::ffi::c_char,
         __arg: *mut __va_list_tag,
-    ) -> ::std::os::raw::c_int;
+    ) -> ::core::ffi::c_int;
 }
 extern "C" {
     pub fn vsscanf(
-        __s: *const ::std::os::raw::c_char,
-        __format: *const ::std::os::raw::c_char,
+        __s: *const ::core::ffi::c_char,
+        __format: *const ::core::ffi::c_char,
         __arg: *mut __va_list_tag,
-    ) -> ::std::os::raw::c_int;
+    ) -> ::core::ffi::c_int;
 }
 extern "C" {
     #[link_name = "\u{1}__isoc99_vfscanf"]
     pub fn vfscanf1(
         __s: *mut FILE,
-        __format: *const ::std::os::raw::c_char,
+        __format: *const ::core::ffi::c_char,
         __arg: *mut __va_list_tag,
-    ) -> ::std::os::raw::c_int;
+    ) -> ::core::ffi::c_int;
 }
 extern "C" {
     #[link_name = "\u{1}__isoc99_vscanf"]
     pub fn vscanf1(
-        __format: *const ::std::os::raw::c_char,
+        __format: *const ::core::ffi::c_char,
         __arg: *mut __va_list_tag,
-    ) -> ::std::os::raw::c_int;
+    ) -> ::core::ffi::c_int;
 }
 extern "C" {
     #[link_name = "\u{1}__isoc99_vsscanf"]
     pub fn vsscanf1(
-        __s: *const ::std::os::raw::c_char,
-        __format: *const ::std::os::raw::c_char,
+        __s: *const ::core::ffi::c_char,
+        __format: *const ::core::ffi::c_char,
         __arg: *mut __va_list_tag,
-    ) -> ::std::os::raw::c_int;
+    ) -> ::core::ffi::c_int;
 }
 extern "C" {
-    pub fn fgetc(__stream: *mut FILE) -> ::std::os::raw::c_int;
+    pub fn fgetc(__stream: *mut FILE) -> ::core::ffi::c_int;
 }
 extern "C" {
-    pub fn getc(__stream: *mut FILE) -> ::std::os::raw::c_int;
+    pub fn getc(__stream: *mut FILE) -> ::core::ffi::c_int;
 }
 extern "C" {
-    pub fn getchar() -> ::std::os::raw::c_int;
+    pub fn getchar() -> ::core::ffi::c_int;
 }
 extern "C" {
-    pub fn getc_unlocked(__stream: *mut FILE) -> ::std::os::raw::c_int;
+    pub fn getc_unlocked(__stream: *mut FILE) -> ::core::ffi::c_int;
 }
 extern "C" {
-    pub fn getchar_unlocked() -> ::std::os::raw::c_int;
+    pub fn getchar_unlocked() -> ::core::ffi::c_int;
 }
 extern "C" {
-    pub fn fgetc_unlocked(__stream: *mut FILE) -> ::std::os::raw::c_int;
+    pub fn fgetc_unlocked(__stream: *mut FILE) -> ::core::ffi::c_int;
 }
 extern "C" {
-    pub fn fputc(__c: ::std::os::raw::c_int, __stream: *mut FILE) -> ::std::os::raw::c_int;
+    pub fn fputc(__c: ::core::ffi::c_int, __stream: *mut FILE) -> ::core::ffi::c_int;
 }
 extern "C" {
-    pub fn putc(__c: ::std::os::raw::c_int, __stream: *mut FILE) -> ::std::os::raw::c_int;
+    pub fn putc(__c: ::core::ffi::c_int, __stream: *mut FILE) -> ::core::ffi::c_int;
 }
 extern "C" {
-    pub fn putchar(__c: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
+    pub fn putchar(__c: ::core::ffi::c_int) -> ::core::ffi::c_int;
 }
 extern "C" {
-    pub fn fputc_unlocked(__c: ::std::os::raw::c_int, __stream: *mut FILE)
-        -> ::std::os::raw::c_int;
+    pub fn fputc_unlocked(__c: ::core::ffi::c_int, __stream: *mut FILE) -> ::core::ffi::c_int;
 }
 extern "C" {
-    pub fn putc_unlocked(__c: ::std::os::raw::c_int, __stream: *mut FILE) -> ::std::os::raw::c_int;
+    pub fn putc_unlocked(__c: ::core::ffi::c_int, __stream: *mut FILE) -> ::core::ffi::c_int;
 }
 extern "C" {
-    pub fn putchar_unlocked(__c: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
+    pub fn putchar_unlocked(__c: ::core::ffi::c_int) -> ::core::ffi::c_int;
 }
 extern "C" {
-    pub fn getw(__stream: *mut FILE) -> ::std::os::raw::c_int;
+    pub fn getw(__stream: *mut FILE) -> ::core::ffi::c_int;
 }
 extern "C" {
-    pub fn putw(__w: ::std::os::raw::c_int, __stream: *mut FILE) -> ::std::os::raw::c_int;
+    pub fn putw(__w: ::core::ffi::c_int, __stream: *mut FILE) -> ::core::ffi::c_int;
 }
 extern "C" {
     pub fn fgets(
-        __s: *mut ::std::os::raw::c_char,
-        __n: ::std::os::raw::c_int,
+        __s: *mut ::core::ffi::c_char,
+        __n: ::core::ffi::c_int,
         __stream: *mut FILE,
-    ) -> *mut ::std::os::raw::c_char;
+    ) -> *mut ::core::ffi::c_char;
 }
 extern "C" {
     pub fn __getdelim(
-        __lineptr: *mut *mut ::std::os::raw::c_char,
+        __lineptr: *mut *mut ::core::ffi::c_char,
         __n: *mut usize,
-        __delimiter: ::std::os::raw::c_int,
+        __delimiter: ::core::ffi::c_int,
         __stream: *mut FILE,
     ) -> __ssize_t;
 }
 extern "C" {
     pub fn getdelim(
-        __lineptr: *mut *mut ::std::os::raw::c_char,
+        __lineptr: *mut *mut ::core::ffi::c_char,
         __n: *mut usize,
-        __delimiter: ::std::os::raw::c_int,
+        __delimiter: ::core::ffi::c_int,
         __stream: *mut FILE,
     ) -> __ssize_t;
 }
 extern "C" {
     pub fn getline(
-        __lineptr: *mut *mut ::std::os::raw::c_char,
+        __lineptr: *mut *mut ::core::ffi::c_char,
         __n: *mut usize,
         __stream: *mut FILE,
     ) -> __ssize_t;
 }
 extern "C" {
-    pub fn fputs(__s: *const ::std::os::raw::c_char, __stream: *mut FILE) -> ::std::os::raw::c_int;
+    pub fn fputs(__s: *const ::core::ffi::c_char, __stream: *mut FILE) -> ::core::ffi::c_int;
 }
 extern "C" {
-    pub fn puts(__s: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
+    pub fn puts(__s: *const ::core::ffi::c_char) -> ::core::ffi::c_int;
 }
 extern "C" {
-    pub fn ungetc(__c: ::std::os::raw::c_int, __stream: *mut FILE) -> ::std::os::raw::c_int;
+    pub fn ungetc(__c: ::core::ffi::c_int, __stream: *mut FILE) -> ::core::ffi::c_int;
 }
 extern "C" {
     pub fn fread(
-        __ptr: *mut ::std::os::raw::c_void,
-        __size: ::std::os::raw::c_ulong,
-        __n: ::std::os::raw::c_ulong,
+        __ptr: *mut ::core::ffi::c_void,
+        __size: ::core::ffi::c_ulong,
+        __n: ::core::ffi::c_ulong,
         __stream: *mut FILE,
-    ) -> ::std::os::raw::c_ulong;
+    ) -> ::core::ffi::c_ulong;
 }
 extern "C" {
     pub fn fwrite(
-        __ptr: *const ::std::os::raw::c_void,
-        __size: ::std::os::raw::c_ulong,
-        __n: ::std::os::raw::c_ulong,
+        __ptr: *const ::core::ffi::c_void,
+        __size: ::core::ffi::c_ulong,
+        __n: ::core::ffi::c_ulong,
         __s: *mut FILE,
-    ) -> ::std::os::raw::c_ulong;
+    ) -> ::core::ffi::c_ulong;
 }
 extern "C" {
     pub fn fread_unlocked(
-        __ptr: *mut ::std::os::raw::c_void,
+        __ptr: *mut ::core::ffi::c_void,
         __size: usize,
         __n: usize,
         __stream: *mut FILE,
@@ -1028,7 +1026,7 @@ extern "C" {
 }
 extern "C" {
     pub fn fwrite_unlocked(
-        __ptr: *const ::std::os::raw::c_void,
+        __ptr: *const ::core::ffi::c_void,
         __size: usize,
         __n: usize,
         __stream: *mut FILE,
@@ -1037,12 +1035,12 @@ extern "C" {
 extern "C" {
     pub fn fseek(
         __stream: *mut FILE,
-        __off: ::std::os::raw::c_long,
-        __whence: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_int;
+        __off: ::core::ffi::c_long,
+        __whence: ::core::ffi::c_int,
+    ) -> ::core::ffi::c_int;
 }
 extern "C" {
-    pub fn ftell(__stream: *mut FILE) -> ::std::os::raw::c_long;
+    pub fn ftell(__stream: *mut FILE) -> ::core::ffi::c_long;
 }
 extern "C" {
     pub fn rewind(__stream: *mut FILE);
@@ -1051,77 +1049,77 @@ extern "C" {
     pub fn fseeko(
         __stream: *mut FILE,
         __off: __off_t,
-        __whence: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_int;
+        __whence: ::core::ffi::c_int,
+    ) -> ::core::ffi::c_int;
 }
 extern "C" {
     pub fn ftello(__stream: *mut FILE) -> __off_t;
 }
 extern "C" {
-    pub fn fgetpos(__stream: *mut FILE, __pos: *mut fpos_t) -> ::std::os::raw::c_int;
+    pub fn fgetpos(__stream: *mut FILE, __pos: *mut fpos_t) -> ::core::ffi::c_int;
 }
 extern "C" {
-    pub fn fsetpos(__stream: *mut FILE, __pos: *const fpos_t) -> ::std::os::raw::c_int;
+    pub fn fsetpos(__stream: *mut FILE, __pos: *const fpos_t) -> ::core::ffi::c_int;
 }
 extern "C" {
     pub fn clearerr(__stream: *mut FILE);
 }
 extern "C" {
-    pub fn feof(__stream: *mut FILE) -> ::std::os::raw::c_int;
+    pub fn feof(__stream: *mut FILE) -> ::core::ffi::c_int;
 }
 extern "C" {
-    pub fn ferror(__stream: *mut FILE) -> ::std::os::raw::c_int;
+    pub fn ferror(__stream: *mut FILE) -> ::core::ffi::c_int;
 }
 extern "C" {
     pub fn clearerr_unlocked(__stream: *mut FILE);
 }
 extern "C" {
-    pub fn feof_unlocked(__stream: *mut FILE) -> ::std::os::raw::c_int;
+    pub fn feof_unlocked(__stream: *mut FILE) -> ::core::ffi::c_int;
 }
 extern "C" {
-    pub fn ferror_unlocked(__stream: *mut FILE) -> ::std::os::raw::c_int;
+    pub fn ferror_unlocked(__stream: *mut FILE) -> ::core::ffi::c_int;
 }
 extern "C" {
-    pub fn perror(__s: *const ::std::os::raw::c_char);
+    pub fn perror(__s: *const ::core::ffi::c_char);
 }
 extern "C" {
-    pub static mut sys_nerr: ::std::os::raw::c_int;
+    pub static mut sys_nerr: ::core::ffi::c_int;
 }
 extern "C" {
-    pub static sys_errlist: [*const ::std::os::raw::c_char; 0usize];
+    pub static sys_errlist: [*const ::core::ffi::c_char; 0usize];
 }
 extern "C" {
-    pub fn fileno(__stream: *mut FILE) -> ::std::os::raw::c_int;
+    pub fn fileno(__stream: *mut FILE) -> ::core::ffi::c_int;
 }
 extern "C" {
-    pub fn fileno_unlocked(__stream: *mut FILE) -> ::std::os::raw::c_int;
+    pub fn fileno_unlocked(__stream: *mut FILE) -> ::core::ffi::c_int;
 }
 extern "C" {
     pub fn popen(
-        __command: *const ::std::os::raw::c_char,
-        __modes: *const ::std::os::raw::c_char,
+        __command: *const ::core::ffi::c_char,
+        __modes: *const ::core::ffi::c_char,
     ) -> *mut FILE;
 }
 extern "C" {
-    pub fn pclose(__stream: *mut FILE) -> ::std::os::raw::c_int;
+    pub fn pclose(__stream: *mut FILE) -> ::core::ffi::c_int;
 }
 extern "C" {
-    pub fn ctermid(__s: *mut ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char;
+    pub fn ctermid(__s: *mut ::core::ffi::c_char) -> *mut ::core::ffi::c_char;
 }
 extern "C" {
     pub fn flockfile(__stream: *mut FILE);
 }
 extern "C" {
-    pub fn ftrylockfile(__stream: *mut FILE) -> ::std::os::raw::c_int;
+    pub fn ftrylockfile(__stream: *mut FILE) -> ::core::ffi::c_int;
 }
 extern "C" {
     pub fn funlockfile(__stream: *mut FILE);
 }
 extern "C" {
-    pub fn __uflow(arg1: *mut FILE) -> ::std::os::raw::c_int;
+    pub fn __uflow(arg1: *mut FILE) -> ::core::ffi::c_int;
 }
 extern "C" {
-    pub fn __overflow(arg1: *mut FILE, arg2: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
+    pub fn __overflow(arg1: *mut FILE, arg2: ::core::ffi::c_int) -> ::core::ffi::c_int;
 }
 pub type int_least8_t = __int_least8_t;
 pub type int_least16_t = __int_least16_t;
@@ -1131,22 +1129,22 @@ pub type uint_least8_t = __uint_least8_t;
 pub type uint_least16_t = __uint_least16_t;
 pub type uint_least32_t = __uint_least32_t;
 pub type uint_least64_t = __uint_least64_t;
-pub type int_fast8_t = ::std::os::raw::c_schar;
-pub type int_fast16_t = ::std::os::raw::c_long;
-pub type int_fast32_t = ::std::os::raw::c_long;
-pub type int_fast64_t = ::std::os::raw::c_long;
-pub type uint_fast8_t = ::std::os::raw::c_uchar;
-pub type uint_fast16_t = ::std::os::raw::c_ulong;
-pub type uint_fast32_t = ::std::os::raw::c_ulong;
-pub type uint_fast64_t = ::std::os::raw::c_ulong;
+pub type int_fast8_t = ::core::ffi::c_schar;
+pub type int_fast16_t = ::core::ffi::c_long;
+pub type int_fast32_t = ::core::ffi::c_long;
+pub type int_fast64_t = ::core::ffi::c_long;
+pub type uint_fast8_t = ::core::ffi::c_uchar;
+pub type uint_fast16_t = ::core::ffi::c_ulong;
+pub type uint_fast32_t = ::core::ffi::c_ulong;
+pub type uint_fast64_t = ::core::ffi::c_ulong;
 pub type intmax_t = __intmax_t;
 pub type uintmax_t = __uintmax_t;
-pub type __gwchar_t = ::std::os::raw::c_int;
+pub type __gwchar_t = ::core::ffi::c_int;
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct imaxdiv_t {
-    pub quot: ::std::os::raw::c_long,
-    pub rem: ::std::os::raw::c_long,
+    pub quot: ::core::ffi::c_long,
+    pub rem: ::core::ffi::c_long,
 }
 extern "C" {
     pub fn imaxabs(__n: intmax_t) -> intmax_t;
@@ -1156,40 +1154,40 @@ extern "C" {
 }
 extern "C" {
     pub fn strtoimax(
-        __nptr: *const ::std::os::raw::c_char,
-        __endptr: *mut *mut ::std::os::raw::c_char,
-        __base: ::std::os::raw::c_int,
+        __nptr: *const ::core::ffi::c_char,
+        __endptr: *mut *mut ::core::ffi::c_char,
+        __base: ::core::ffi::c_int,
     ) -> intmax_t;
 }
 extern "C" {
     pub fn strtoumax(
-        __nptr: *const ::std::os::raw::c_char,
-        __endptr: *mut *mut ::std::os::raw::c_char,
-        __base: ::std::os::raw::c_int,
+        __nptr: *const ::core::ffi::c_char,
+        __endptr: *mut *mut ::core::ffi::c_char,
+        __base: ::core::ffi::c_int,
     ) -> uintmax_t;
 }
 extern "C" {
     pub fn wcstoimax(
         __nptr: *const __gwchar_t,
         __endptr: *mut *mut __gwchar_t,
-        __base: ::std::os::raw::c_int,
+        __base: ::core::ffi::c_int,
     ) -> intmax_t;
 }
 extern "C" {
     pub fn wcstoumax(
         __nptr: *const __gwchar_t,
         __endptr: *mut *mut __gwchar_t,
-        __base: ::std::os::raw::c_int,
+        __base: ::core::ffi::c_int,
     ) -> uintmax_t;
 }
 pub type PLI_UINT64 = u64;
 pub type PLI_INT64 = i64;
 pub type PLI_UINT32 = u32;
 pub type PLI_INT32 = i32;
-pub type PLI_INT16 = ::std::os::raw::c_short;
-pub type PLI_UINT16 = ::std::os::raw::c_ushort;
-pub type PLI_BYTE8 = ::std::os::raw::c_char;
-pub type PLI_UBYTE8 = ::std::os::raw::c_uchar;
+pub type PLI_INT16 = ::core::ffi::c_short;
+pub type PLI_UINT16 = ::core::ffi::c_ushort;
+pub type PLI_BYTE8 = ::core::ffi::c_char;
+pub type PLI_UBYTE8 = ::core::ffi::c_uchar;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct __vpiHandle {
@@ -1201,17 +1199,17 @@ pub type vpiHandle = *mut __vpiHandle;
 pub struct t_vpi_systf_data {
     pub type_: PLI_INT32,
     pub sysfunctype: PLI_INT32,
-    pub tfname: *const ::std::os::raw::c_char,
-    pub calltf: ::std::option::Option<unsafe extern "C" fn(arg1: *mut PLI_BYTE8) -> PLI_INT32>,
-    pub compiletf: ::std::option::Option<unsafe extern "C" fn(arg1: *mut PLI_BYTE8) -> PLI_INT32>,
-    pub sizetf: ::std::option::Option<unsafe extern "C" fn(arg1: *mut PLI_BYTE8) -> PLI_INT32>,
+    pub tfname: *const ::core::ffi::c_char,
+    pub calltf: ::core::option::Option<unsafe extern "C" fn(arg1: *mut PLI_BYTE8) -> PLI_INT32>,
+    pub compiletf: ::core::option::Option<unsafe extern "C" fn(arg1: *mut PLI_BYTE8) -> PLI_INT32>,
+    pub sizetf: ::core::option::Option<unsafe extern "C" fn(arg1: *mut PLI_BYTE8) -> PLI_INT32>,
     pub user_data: *mut PLI_BYTE8,
 }
 impl Default for t_vpi_systf_data {
     fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
     }
@@ -1222,15 +1220,15 @@ pub type p_vpi_systf_data = *mut t_vpi_systf_data;
 #[derive(Debug, Copy, Clone)]
 pub struct t_vpi_vlog_info {
     pub argc: PLI_INT32,
-    pub argv: *mut *mut ::std::os::raw::c_char,
-    pub product: *mut ::std::os::raw::c_char,
-    pub version: *mut ::std::os::raw::c_char,
+    pub argv: *mut *mut ::core::ffi::c_char,
+    pub product: *mut ::core::ffi::c_char,
+    pub version: *mut ::core::ffi::c_char,
 }
 impl Default for t_vpi_vlog_info {
     fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
     }
@@ -1273,29 +1271,29 @@ pub struct t_vpi_value {
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub union t_vpi_value__bindgen_ty_1 {
-    pub str_: *mut ::std::os::raw::c_char,
+    pub str_: *mut ::core::ffi::c_char,
     pub scalar: PLI_INT32,
     pub integer: PLI_INT32,
     pub real: f64,
     pub time: *mut t_vpi_time,
     pub vector: *mut t_vpi_vecval,
     pub strength: *mut t_vpi_strengthval,
-    pub misc: *mut ::std::os::raw::c_char,
+    pub misc: *mut ::core::ffi::c_char,
 }
 impl Default for t_vpi_value__bindgen_ty_1 {
     fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
     }
 }
 impl Default for t_vpi_value {
     fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
     }
@@ -1314,9 +1312,9 @@ pub struct t_vpi_delay {
 }
 impl Default for t_vpi_delay {
     fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
     }
@@ -1330,27 +1328,27 @@ extern "C" {
     pub fn vpi_get_systf_info(obj: vpiHandle, data: p_vpi_systf_data);
 }
 extern "C" {
-    pub fn vpi_mcd_open(name: *mut ::std::os::raw::c_char) -> PLI_UINT32;
+    pub fn vpi_mcd_open(name: *mut ::core::ffi::c_char) -> PLI_UINT32;
 }
 extern "C" {
     pub fn vpi_mcd_close(mcd: PLI_UINT32) -> PLI_UINT32;
 }
 extern "C" {
-    pub fn vpi_mcd_name(mcd: PLI_UINT32) -> *mut ::std::os::raw::c_char;
+    pub fn vpi_mcd_name(mcd: PLI_UINT32) -> *mut ::core::ffi::c_char;
 }
 extern "C" {
-    pub fn vpi_mcd_printf(mcd: PLI_UINT32, fmt: *const ::std::os::raw::c_char, ...) -> PLI_INT32;
+    pub fn vpi_mcd_printf(mcd: PLI_UINT32, fmt: *const ::core::ffi::c_char, ...) -> PLI_INT32;
 }
 extern "C" {
-    pub fn vpi_printf(fmt: *const ::std::os::raw::c_char, ...) -> PLI_INT32;
+    pub fn vpi_printf(fmt: *const ::core::ffi::c_char, ...) -> PLI_INT32;
 }
 extern "C" {
-    pub fn vpi_vprintf(fmt: *const ::std::os::raw::c_char, ap: *mut __va_list_tag) -> PLI_INT32;
+    pub fn vpi_vprintf(fmt: *const ::core::ffi::c_char, ap: *mut __va_list_tag) -> PLI_INT32;
 }
 extern "C" {
     pub fn vpi_mcd_vprintf(
         mcd: PLI_UINT32,
-        fmt: *const ::std::os::raw::c_char,
+        fmt: *const ::core::ffi::c_char,
         ap: *mut __va_list_tag,
     ) -> PLI_INT32;
 }
@@ -1362,8 +1360,8 @@ extern "C" {
 }
 extern "C" {
     pub fn vpi_fopen(
-        name: *const ::std::os::raw::c_char,
-        mode: *const ::std::os::raw::c_char,
+        name: *const ::core::ffi::c_char,
+        mode: *const ::core::ffi::c_char,
     ) -> PLI_INT32;
 }
 extern "C" {
@@ -1373,7 +1371,7 @@ extern "C" {
 #[derive(Debug, Copy, Clone)]
 pub struct t_cb_data {
     pub reason: PLI_INT32,
-    pub cb_rtn: ::std::option::Option<unsafe extern "C" fn(cb: *mut t_cb_data) -> PLI_INT32>,
+    pub cb_rtn: ::core::option::Option<unsafe extern "C" fn(cb: *mut t_cb_data) -> PLI_INT32>,
     pub obj: vpiHandle,
     pub time: p_vpi_time,
     pub value: p_vpi_value,
@@ -1382,9 +1380,9 @@ pub struct t_cb_data {
 }
 impl Default for t_cb_data {
     fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
     }
@@ -1416,7 +1414,7 @@ extern "C" {
     pub fn vpi_handle_by_index(ref_: vpiHandle, idx: PLI_INT32) -> vpiHandle;
 }
 extern "C" {
-    pub fn vpi_handle_by_name(name: *const ::std::os::raw::c_char, scope: vpiHandle) -> vpiHandle;
+    pub fn vpi_handle_by_name(name: *const ::core::ffi::c_char, scope: vpiHandle) -> vpiHandle;
 }
 extern "C" {
     pub fn vpi_handle_multi(type_: PLI_INT32, ref1: vpiHandle, ref2: vpiHandle) -> vpiHandle;
@@ -1425,10 +1423,10 @@ extern "C" {
     pub fn vpi_get_time(obj: vpiHandle, t: *mut s_vpi_time);
 }
 extern "C" {
-    pub fn vpi_get(property: ::std::os::raw::c_int, ref_: vpiHandle) -> PLI_INT32;
+    pub fn vpi_get(property: ::core::ffi::c_int, ref_: vpiHandle) -> PLI_INT32;
 }
 extern "C" {
-    pub fn vpi_get_str(property: PLI_INT32, ref_: vpiHandle) -> *mut ::std::os::raw::c_char;
+    pub fn vpi_get_str(property: PLI_INT32, ref_: vpiHandle) -> *mut ::core::ffi::c_char;
 }
 extern "C" {
     pub fn vpi_get_value(expr: vpiHandle, value: p_vpi_value);
@@ -1460,27 +1458,27 @@ extern "C" {
     pub fn vpi_compare_objects(obj1: vpiHandle, obj2: vpiHandle) -> PLI_INT32;
 }
 extern "C" {
-    pub fn vpi_put_userdata(obj: vpiHandle, data: *mut ::std::os::raw::c_void) -> PLI_INT32;
+    pub fn vpi_put_userdata(obj: vpiHandle, data: *mut ::core::ffi::c_void) -> PLI_INT32;
 }
 extern "C" {
-    pub fn vpi_get_userdata(obj: vpiHandle) -> *mut ::std::os::raw::c_void;
+    pub fn vpi_get_userdata(obj: vpiHandle) -> *mut ::core::ffi::c_void;
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct t_vpi_error_info {
     pub state: PLI_INT32,
     pub level: PLI_INT32,
-    pub message: *mut ::std::os::raw::c_char,
-    pub product: *mut ::std::os::raw::c_char,
-    pub code: *mut ::std::os::raw::c_char,
-    pub file: *mut ::std::os::raw::c_char,
+    pub message: *mut ::core::ffi::c_char,
+    pub product: *mut ::core::ffi::c_char,
+    pub code: *mut ::core::ffi::c_char,
+    pub file: *mut ::core::ffi::c_char,
     pub line: PLI_INT32,
 }
 impl Default for t_vpi_error_info {
     fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
     }
@@ -1491,17 +1489,17 @@ extern "C" {
     pub fn vpi_chk_error(info: p_vpi_error_info) -> PLI_INT32;
 }
 extern "C" {
-    pub static mut vlog_startup_routines: [::std::option::Option<unsafe extern "C" fn()>; 0usize];
+    pub static mut vlog_startup_routines: [::core::option::Option<unsafe extern "C" fn()>; 0usize];
 }
 extern "C" {
     pub fn vpip_format_strength(
-        str_: *mut ::std::os::raw::c_char,
+        str_: *mut ::core::ffi::c_char,
         value: *mut s_vpi_value,
-        bit: ::std::os::raw::c_uint,
+        bit: ::core::ffi::c_uint,
     );
 }
 extern "C" {
-    pub fn vpip_set_return_value(value: ::std::os::raw::c_int);
+    pub fn vpip_set_return_value(value: ::core::ffi::c_int);
 }
 extern "C" {
     pub fn vpip_calc_clog2(arg: vpiHandle) -> s_vpi_vecval;
@@ -1510,29 +1508,29 @@ extern "C" {
     pub fn vpip_make_systf_system_defined(ref_: vpiHandle);
 }
 extern "C" {
-    pub fn vpip_mcd_rawwrite(mcd: PLI_UINT32, buf: *const ::std::os::raw::c_char, count: usize);
+    pub fn vpip_mcd_rawwrite(mcd: PLI_UINT32, buf: *const ::core::ffi::c_char, count: usize);
 }
 extern "C" {
     pub fn vpip_count_drivers(
         ref_: vpiHandle,
-        idx: ::std::os::raw::c_uint,
-        counts: *mut ::std::os::raw::c_uint,
+        idx: ::core::ffi::c_uint,
+        counts: *mut ::core::ffi::c_uint,
     );
 }
 pub type __builtin_va_list = [__va_list_tag; 1usize];
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct __va_list_tag {
-    pub gp_offset: ::std::os::raw::c_uint,
-    pub fp_offset: ::std::os::raw::c_uint,
-    pub overflow_arg_area: *mut ::std::os::raw::c_void,
-    pub reg_save_area: *mut ::std::os::raw::c_void,
+    pub gp_offset: ::core::ffi::c_uint,
+    pub fp_offset: ::core::ffi::c_uint,
+    pub overflow_arg_area: *mut ::core::ffi::c_void,
+    pub reg_save_area: *mut ::core::ffi::c_void,
 }
 impl Default for __va_list_tag {
     fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
     }

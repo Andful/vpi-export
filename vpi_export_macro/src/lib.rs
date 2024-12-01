@@ -37,8 +37,8 @@ fn args_impl(args: &Punctuated<FnArg, Comma>) -> proc_macro2::TokenStream {
 
 #[proc_macro_attribute]
 pub fn vpi_export(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    let funtion = parse_macro_input!(item as ItemFn);
-    let ItemFn { sig, .. } = funtion.clone();
+    let function = parse_macro_input!(item as ItemFn);
+    let ItemFn { sig, .. } = function.clone();
     let Signature {
         ident: fn_ident,
         inputs,
@@ -62,22 +62,20 @@ pub fn vpi_export(_attr: TokenStream, item: TokenStream) -> TokenStream {
     let register_fm = quote! {
         #[vpi_export::ctor]
         static #test_name: () = {
-            vpi_export::__FUNCTION_COLLECTIONS__.values.lock().unwrap().push(#fn_name);
+            vpi_export::__FUNCTION_COLLECTIONS__.push(#fn_name);
         };
         pub fn #fn_name() {
-            //nsafe extern "C" fn(arg1: *mut PLI_BYTE8) -> PLI_INT32
             use vpi_export::vpi_user::*;
             unsafe extern "C" fn wrapper(_user_data: *mut vpi_export::vpi_user::PLI_BYTE8) -> vpi_export::vpi_user::PLI_INT32 {
-                let systfref = vpi_handle(vpiSysTfCall as i32, std::ptr::null_mut());
-                let args_iter = vpi_iterate(vpiArgument as i32, systfref);
+                let systfref = vpi_handle(vpiSysTfCall as PLI_INT32, core::ptr::null_mut());
+                let args_iter = vpi_iterate(vpiArgument as PLI_INT32, systfref);
                 #args_instantiation
                 #fn_ident(#args);
                 0
             }
-            let func_name_ptr = #func_name_literal.as_ptr() as *mut i8;
-
+            let func_name_ptr = #func_name_literal.as_ptr() as *const core::ffi::c_char;
             let mut task_data_p = s_vpi_systf_data {
-                type_: vpiSysTask as i32,
+                type_: vpiSysTask as PLI_INT32,
                 tfname: func_name_ptr,
                 calltf: Some(wrapper),
                 ..Default::default()
@@ -89,7 +87,7 @@ pub fn vpi_export(_attr: TokenStream, item: TokenStream) -> TokenStream {
     };
     quote! {
         #register_fm
-        #funtion
+        #function
     }
     .into()
 }
