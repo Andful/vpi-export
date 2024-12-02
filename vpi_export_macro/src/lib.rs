@@ -52,38 +52,24 @@ pub fn vpi_task(_attr: TokenStream, item: TokenStream) -> TokenStream {
         format!("${}\0", fn_ident).as_bytes(),
         proc_macro2::Span::call_site(),
     );
-    let mod_name = proc_macro2::Ident::new(
-        &format!("__ASSIGN_{}__", fn_ident).to_uppercase(),
-        proc_macro2::Span::call_site(),
-    );
     let args = args_impl(&inputs);
     let args_instantiation = args_instantiation_impl(&inputs);
 
     let register_fm = quote! {
-        mod #mod_name {
-            use ::vpi_export::__hidden__::*;
-            static VPI_FUNCTION_NODE: VpiFunctionNode = VpiFunctionNode::new(init);
+        const _: () = {
+            use ::vpi_export::__hidden__::{
+                ctor, VpiFunctionCollection, VpiFunctionNode, VPI_FUNCTION_COLLECTION,
+            };
+            use ::vpi_export::vpi_user::*;
 
             #[ctor]
             fn ctor() {
-                VPI_FUNCTION_COLLECTIONS.push(&VPI_FUNCTION_NODE);
+                static mut VPI_FUNCTION_NODE: VpiFunctionNode = VpiFunctionNode::new(init);
+                //SAFETY: this ctor function is called only once
+                VPI_FUNCTION_COLLECTION.push(unsafe { &mut VPI_FUNCTION_NODE });
             }
 
             pub fn init() {
-                use vpi_export::vpi_user::*;
-                unsafe extern "C" fn wrapper(_user_data: *mut vpi_export::vpi_user::PLI_BYTE8) -> vpi_export::vpi_user::PLI_INT32 {
-                    use super::*;
-                    let systfref = vpi_handle(vpiSysTfCall as PLI_INT32, ::core::ptr::null_mut());
-                    let args_iter = vpi_iterate(vpiArgument as PLI_INT32, systfref);
-                    {
-                        #args_instantiation
-                        #fn_ident(#args);
-                    }
-                    if args_iter != ::core::ptr::null_mut(){
-                        vpi_free_object(args_iter);
-                    }
-                    0
-                }
                 let func_name_ptr = #func_name_literal.as_ptr() as *const ::core::ffi::c_char;
                 let mut task_data_p = s_vpi_systf_data {
                     type_: vpiSysTask as PLI_INT32,
@@ -96,7 +82,20 @@ pub fn vpi_task(_attr: TokenStream, item: TokenStream) -> TokenStream {
                     vpi_register_systf(&mut task_data_p);
                 }
             }
-        }
+
+            unsafe extern "C" fn wrapper(_user_data: *mut vpi_export::vpi_user::PLI_BYTE8) -> vpi_export::vpi_user::PLI_INT32 {
+                let systfref = vpi_handle(vpiSysTfCall as PLI_INT32, ::core::ptr::null_mut());
+                let args_iter = vpi_iterate(vpiArgument as PLI_INT32, systfref);
+                {
+                    #args_instantiation
+                    #fn_ident(#args);
+                }
+                if args_iter != ::core::ptr::null_mut(){
+                    vpi_free_object(args_iter);
+                }
+                0
+            }
+        };
     };
     quote! {
         #register_fm

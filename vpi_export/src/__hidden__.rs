@@ -1,57 +1,49 @@
-use core::{
-    ptr::NonNull,
-    sync::atomic::{AtomicPtr, Ordering},
-};
+use core::sync::atomic::{AtomicPtr, Ordering};
 
 pub use ctor::ctor;
 
-pub struct VpiFunctionCollections {
+pub struct VpiFunctionCollection {
     head: AtomicPtr<VpiFunctionNode>,
 }
 
 pub struct VpiFunctionNode {
     f: fn(),
-    next: AtomicPtr<VpiFunctionNode>,
+    next: *const VpiFunctionNode,
 }
 
 impl VpiFunctionNode {
     pub const fn new(f: fn()) -> Self {
         Self {
             f,
-            next: AtomicPtr::new(core::ptr::null_mut()),
+            next: core::ptr::null(),
         }
     }
 }
 
-impl VpiFunctionCollections {
+impl VpiFunctionCollection {
     const fn new() -> Self {
         Self {
             head: AtomicPtr::new(core::ptr::null_mut()),
         }
     }
 
-    pub fn push(&self, vpi_function_node: &VpiFunctionNode) {
+    pub fn push(&self, vpi_function_node: &mut VpiFunctionNode) {
         let next = self.head.swap(
             vpi_function_node as *const VpiFunctionNode as *mut VpiFunctionNode,
             Ordering::Relaxed,
         );
-        vpi_function_node.next.store(next, Ordering::Relaxed);
+        vpi_function_node.next = next;
     }
 }
 
-pub static VPI_FUNCTION_COLLECTIONS: VpiFunctionCollections = VpiFunctionCollections::new();
+pub static VPI_FUNCTION_COLLECTION: VpiFunctionCollection = VpiFunctionCollection::new();
 
 pub extern "C" fn register_vpi_functions() {
-    let mut head = NonNull::new(
-        VPI_FUNCTION_COLLECTIONS
-            .head
-            .swap(core::ptr::null_mut(), Ordering::Relaxed),
-    );
-    while let Some(ptr) = head {
-        //SAFETY: No mutable references of the vpi_function_node exists
-        let vpi_function_node = unsafe { ptr.as_ref() };
+    let mut head = VPI_FUNCTION_COLLECTION.head.load(Ordering::Relaxed) as *const VpiFunctionNode;
+    //SAFETY: No mutable references of the vpi_function_node exists
+    while let Some(vpi_function_node) = unsafe { head.as_ref() } {
         (vpi_function_node.f)();
-        head = NonNull::new(vpi_function_node.next.load(Ordering::Relaxed));
+        head = vpi_function_node.next;
     }
 }
 
