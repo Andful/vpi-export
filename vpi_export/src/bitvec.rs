@@ -2,6 +2,7 @@ use core::fmt::Write;
 
 use crate::{FromVpiHandle, IntoVpiHandle, VpiConversionError};
 
+///Verilog bit vector type.
 pub struct BitVector<const N: usize>([u32; (N - 1) / 32 + 1])
 where
     [u32; (N - 1) / 32 + 1]:;
@@ -19,12 +20,14 @@ impl<const N: usize> BitVector<N>
 where
     [u32; (N - 1) / 32 + 1]:,
 {
+    ///Convert from raw [u32] data
     pub fn from_raw(data: &[u32]) -> Self {
         let mut result: BitVector<N> = Default::default();
         let l = result.0.len().min(data.len());
         result.0[0..l].copy_from_slice(&data[0..l]);
         result
     }
+    ///Concatenate two [BitVector] objects
     pub fn concat<const M: usize>(self, b: BitVector<M>) -> BitVector<{ N + M }>
     where
         [u32; (M - 1) / 32 + 1]:,

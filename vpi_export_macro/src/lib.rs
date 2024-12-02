@@ -38,6 +38,7 @@ fn args_impl(args: &Punctuated<FnArg, Comma>) -> proc_macro2::TokenStream {
     quote! { #result }
 }
 
+/// Export function as a vpi task
 #[proc_macro_attribute]
 pub fn vpi_task(_attr: TokenStream, item: TokenStream) -> TokenStream {
     let function = parse_macro_input!(item as ItemFn);
