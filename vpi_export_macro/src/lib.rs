@@ -2,41 +2,44 @@
 
 extern crate proc_macro;
 use proc_macro::TokenStream;
-use proc_macro2;
+use proc_macro2::{self, Span};
 use quote::quote;
 use syn::{
-    parse_macro_input, punctuated::Punctuated, token::Comma, FnArg, ItemFn, LitByteStr, Pat,
-    PatType, Signature,
+    parse_macro_input, punctuated::Punctuated, token::Comma, FnArg, Ident, ItemFn, LitByteStr,
+    LitStr, PatType, Signature,
 };
 
-fn arg_instantiation_impl(arg: &FnArg) -> proc_macro2::TokenStream {
+fn arg_instantiation_impl(arg: &FnArg, arg_ident: Ident) -> proc_macro2::TokenStream {
     match arg {
-        FnArg::Typed(PatType { pat, ty, .. }) => quote! {
+        FnArg::Typed(PatType { ty, .. }) => quote! {
             let handle = vpi_scan(args_iter);
-            let #pat: #ty = vpi_export::FromVpiHandle::from_vpi_handle(handle);
+            if handle == ::core::ptr::null_mut() {
+                panic!("not enough arguments");
+            }
+            let #arg_ident: #ty = vpi_export::FromVpiHandle::from_vpi_handle(handle).unwrap();
         },
         _ => panic!("Only functions supported"),
     }
 }
 
 fn args_instantiation_impl(args: &Punctuated<FnArg, Comma>) -> proc_macro2::TokenStream {
-    let args = args.iter().map(arg_instantiation_impl).collect::<Vec<_>>();
+    let args = args
+        .iter()
+        .enumerate()
+        .map(|(i, e)| arg_instantiation_impl(e, Ident::new(&format!("arg_{i}"), Span::call_site())))
+        .collect::<Vec<_>>();
     quote! { #(#args)* }
 }
 
 fn args_impl(args: &Punctuated<FnArg, Comma>) -> proc_macro2::TokenStream {
-    let result: Punctuated<Box<Pat>, Comma> = args
-        .iter()
-        .map(|e| match e {
-            FnArg::Receiver(_) => panic!(),
-            FnArg::Typed(e) => e.pat.clone(),
-        })
+    let result: Punctuated<Ident, Comma> = (0..args.len())
+        .map(|i| Ident::new(&format!("arg_{i}"), Span::call_site()))
         .collect();
     quote! { #result }
 }
 
 #[proc_macro_attribute]
-pub fn vpi_export(_attr: TokenStream, item: TokenStream) -> TokenStream {
+pub fn vpi_task(_attr: TokenStream, item: TokenStream) -> TokenStream {
     let function = parse_macro_input!(item as ItemFn);
     let ItemFn { sig, .. } = function.clone();
     let Signature {
@@ -44,15 +47,11 @@ pub fn vpi_export(_attr: TokenStream, item: TokenStream) -> TokenStream {
         inputs,
         ..
     } = sig;
-    let fn_name = proc_macro2::Ident::new(
-        &format!("__hidden_{}_register", fn_ident),
-        proc_macro2::Span::call_site(),
-    );
     let func_name_literal = LitByteStr::new(
         format!("${}\0", fn_ident).as_bytes(),
         proc_macro2::Span::call_site(),
     );
-    let test_name = proc_macro2::Ident::new(
+    let mod_name = proc_macro2::Ident::new(
         &format!("__ASSIGN_{}__", fn_ident).to_uppercase(),
         proc_macro2::Span::call_site(),
     );
@@ -60,34 +59,99 @@ pub fn vpi_export(_attr: TokenStream, item: TokenStream) -> TokenStream {
     let args_instantiation = args_instantiation_impl(&inputs);
 
     let register_fm = quote! {
-        #[vpi_export::ctor]
-        static #test_name: () = {
-            vpi_export::__FUNCTION_COLLECTIONS__.push(#fn_name);
-        };
-        pub fn #fn_name() {
-            use vpi_export::vpi_user::*;
-            unsafe extern "C" fn wrapper(_user_data: *mut vpi_export::vpi_user::PLI_BYTE8) -> vpi_export::vpi_user::PLI_INT32 {
-                let systfref = vpi_handle(vpiSysTfCall as PLI_INT32, core::ptr::null_mut());
-                let args_iter = vpi_iterate(vpiArgument as PLI_INT32, systfref);
-                #args_instantiation
-                #fn_ident(#args);
-                0
+        mod #mod_name {
+            use ::vpi_export::__hidden__::*;
+            static VPI_FUNCTION_NODE: VpiFunctionNode = VpiFunctionNode::new(init);
+
+            #[ctor]
+            fn ctor() {
+                VPI_FUNCTION_COLLECTIONS.push(&VPI_FUNCTION_NODE);
             }
-            let func_name_ptr = #func_name_literal.as_ptr() as *const core::ffi::c_char;
-            let mut task_data_p = s_vpi_systf_data {
-                type_: vpiSysTask as PLI_INT32,
-                tfname: func_name_ptr,
-                calltf: Some(wrapper),
-                ..Default::default()
-            };
-            unsafe {
-                vpi_register_systf(&mut task_data_p);
+
+            pub fn init() {
+                use vpi_export::vpi_user::*;
+                unsafe extern "C" fn wrapper(_user_data: *mut vpi_export::vpi_user::PLI_BYTE8) -> vpi_export::vpi_user::PLI_INT32 {
+                    use super::*;
+                    let systfref = vpi_handle(vpiSysTfCall as PLI_INT32, ::core::ptr::null_mut());
+                    let args_iter = vpi_iterate(vpiArgument as PLI_INT32, systfref);
+                    {
+                        #args_instantiation
+                        #fn_ident(#args);
+                    }
+                    if args_iter != ::core::ptr::null_mut(){
+                        vpi_free_object(args_iter);
+                    }
+                    0
+                }
+                let func_name_ptr = #func_name_literal.as_ptr() as *const ::core::ffi::c_char;
+                let mut task_data_p = s_vpi_systf_data {
+                    type_: vpiSysTask as PLI_INT32,
+                    tfname: func_name_ptr,
+                    calltf: Some(wrapper),
+                    ..Default::default()
+                };
+                //SAFETY: correct usage of function
+                unsafe {
+                    vpi_register_systf(&mut task_data_p);
+                }
             }
         }
     };
     quote! {
         #register_fm
         #function
+    }
+    .into()
+}
+
+#[proc_macro]
+pub fn bitvec(input: TokenStream) -> TokenStream {
+    let input = parse_macro_input!(input as LitStr);
+    let value = input.value();
+
+    use regex::Regex;
+
+    let re = Regex::new(r"^(\d*)'([b|d|o|h])([0-9|a|b|c|d|e|f]*)$").unwrap();
+    let Some(caps) = re.captures(&value) else {
+        panic!("Literal \"{}\" is not a valid verilog vector", value);
+    };
+
+    let len = caps[1].parse::<usize>().ok();
+    let encoding = &caps[2];
+    let data = &caps[3];
+
+    let (bits, filled) = match encoding {
+        "b" => {
+            let mut bits = Vec::<u32>::new();
+            let mut b = 0;
+            let mut filled = 0;
+            for c in data.chars() {
+                filled += 1;
+                if filled % 32 == 0 {
+                    bits.push(b);
+                    b = 0;
+                }
+                match c {
+                    '1' => b = (b << 1) | 1,
+                    '0' => b = (b << 1) | 0,
+                    _ => panic!("invalid input"),
+                }
+            }
+            bits.push(b);
+            (bits, filled)
+        }
+        "d" => todo!(),
+        "o" => todo!(),
+        "h" => todo!(),
+        e => unreachable!("{e}"),
+    };
+
+    let len = len.unwrap_or(filled);
+
+    // generate code, include `str_value` variable (automatically encodes
+    // `String` as a string literal in the generated code)
+    quote! {
+        vpi_export::BitVector::<#len>::from_raw(&[#(#bits),*])
     }
     .into()
 }
