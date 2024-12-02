@@ -7,7 +7,6 @@ description = "proc-macro for vpi_export"
 documentation = "https://docs.rs/vpi-export-macro"
 repository = "https://github.com/Andful/vpi-export"
 homepage = "https://github.com/Andful/vpi-export"
-readme = "./README.md"
 
 [lib]
 proc-macro = true
