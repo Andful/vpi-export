@@ -3,6 +3,7 @@ use core::fmt::Write;
 use crate::{FromVpiHandle, IntoVpiHandle, VpiConversionError};
 
 ///Verilog bit vector type.
+#[derive(Clone)]
 pub struct BitVector<const N: usize>([u32; (N - 1) / 32 + 1])
 where
     [u32; (N - 1) / 32 + 1]:;
@@ -34,16 +35,15 @@ where
         [u32; (N + M - 1) / 32 + 1]:,
     {
         let mut result = BitVector::<{ N + M }>::default();
-        result.0[0..self.0.len()].copy_from_slice(&self.0);
-
-        if N % 32 == 0 {
-            result.0[self.0.len()..].copy_from_slice(&b.0);
+        result.0[0..b.0.len()].copy_from_slice(&b.0);
+        let shift = N % 32;
+        if shift == 0 {
+            result.0[b.0.len()..].copy_from_slice(&self.0);
         } else {
-            let shift = N % 32;
             let mut prev = 0;
-            for i in 0..b.0.len() {
-                let current = b.0[i];
-                result.0[self.0.len() + i - 1] |= (current << (32 - shift)) | (prev >> shift);
+            for i in 0..self.0.len() {
+                let current = self.0[i];
+                result.0[b.0.len() + i - 1] |= (current << (32 - shift)) | (prev >> shift);
                 prev = current;
             }
         }
