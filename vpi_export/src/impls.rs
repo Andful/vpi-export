@@ -9,7 +9,7 @@ macro_rules! impl_from_vpi_handle {
                     ..Default::default()
                 };
                 vpi_user::vpi_get_value(handle, &mut value as *mut vpi_user::t_vpi_value);
-                Ok(value.value.integer as $t)
+                Ok(unsafe { value.value.integer } as $t)
             }
         }
     };
@@ -80,7 +80,7 @@ impl IntoVpiHandle for f32 {
 impl FromVpiHandle for &str {
     unsafe fn from_vpi_handle(handle: vpi_user::vpiHandle) -> Result<Self> {
         let s: &core::ffi::CStr = FromVpiHandle::from_vpi_handle(handle)?;
-        s.to_str().map_err(|e| VpiConversionError::Utf8Error(e))
+        s.to_str().map_err(VpiConversionError::Utf8Error)
     }
 }
 

@@ -1,6 +1,6 @@
 [package]
 name = "vpi_export"
-version = "0.1.3"
+version = "0.1.4"
 edition = "2021"
 license = "MIT"
 description = "Export Rust function to be used on a verilog module through VPI"
@@ -8,10 +8,16 @@ documentation = "https://docs.rs/vpi-export"
 repository = "https://github.com/Andful/vpi-export"
 homepage = "https://github.com/Andful/vpi-export"
 readme = "../README.md"
+keywords = ["no_std", "verilog", "vpi", "ffi", "fpga"]
+categories = ["development-tools::ffi", "development-tools::debugging"]
+
+[features]
+iverilog-vpi-user = []
 
 [dependencies]
 ctor = "0.2.9"
-vpi_export_macro = "0.1.3"
+vpi_export_macro = "0.1.4"
 
 [build-dependencies]
 bindgen = "0.70.1"
+git2 = "0.19.0"

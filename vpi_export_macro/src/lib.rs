@@ -70,7 +70,7 @@ pub fn vpi_task(_attr: TokenStream, item: TokenStream) -> TokenStream {
             }
 
             pub fn init() {
-                let func_name_ptr = #func_name_literal.as_ptr() as *const ::core::ffi::c_char;
+                let func_name_ptr = #func_name_literal.as_ptr() as *mut ::core::ffi::c_char;
                 let mut task_data_p = s_vpi_systf_data {
                     type_: vpiSysTask as PLI_INT32,
                     tfname: func_name_ptr,
@@ -133,7 +133,7 @@ pub fn bitvec(input: TokenStream) -> TokenStream {
                 }
                 match c {
                     '1' => b = (b << 1) | 1,
-                    '0' => b = (b << 1) | 0,
+                    '0' => b <<= 1,
                     _ => panic!("invalid input"),
                 }
             }

@@ -10,7 +10,7 @@ where
 
 impl From<u32> for BitVector<32>
 where
-    [u32; (32 - 1) / 32 + 1]:,
+    [u32; 1]:,
 {
     fn from(value: u32) -> Self {
         Self([value])
@@ -62,7 +62,7 @@ where
             let mut bits = self.0[i];
             let mut n = 32;
             if i == self.0.len() - 1 {
-                bits = bits << (31 - ((N - 1) % 32));
+                bits <<= 31 - ((N - 1) % 32);
                 n = (N - 1) % 32 + 1;
             }
             for _ in 0..n {
@@ -71,7 +71,7 @@ where
                 } else {
                     f.write_char('0')?;
                 }
-                bits = bits << 1;
+                bits <<= 1;
             }
         }
         Ok(())
@@ -91,23 +91,31 @@ impl<const N: usize> FromVpiHandle for BitVector<N>
 where
     [(); (N - 1) / 32 + 1]:,
 {
+    //Safety: handle must NOT be dangling or null
     unsafe fn from_vpi_handle(handle: crate::vpi_user::vpiHandle) -> crate::Result<Self> {
         use crate::vpi_user;
         let mut value = vpi_user::t_vpi_value {
             format: vpi_user::vpiVectorVal as i32,
             ..Default::default()
         };
-        let size = vpi_user::vpi_get(vpi_user::vpiSize as i32, handle) as usize;
+
+        //Safety: correct use of ffi
+        let size = unsafe { vpi_user::vpi_get(vpi_user::vpiSize as i32, handle) } as usize;
         if size != N {
             return Err(VpiConversionError::BitVectorMissMatch {
                 expected: N,
                 actual: size as usize,
             });
         }
-        vpi_user::vpi_get_value(handle, &mut value as *mut vpi_user::t_vpi_value);
+
+        //Safety: correct use of ffi function
+        unsafe {
+            vpi_user::vpi_get_value(handle, &mut value as *mut vpi_user::t_vpi_value);
+        }
         let mut result = Self::default();
         for i in 0..result.0.len() {
-            result.0[i] = (*(value.value.vector.add(i))).aval as u32;
+            //Safety: value obtained correctly
+            result.0[i] = unsafe { *(value.value.vector.add(i)) }.aval;
         }
         Ok(result)
     }
@@ -117,6 +125,7 @@ impl<const N: usize> IntoVpiHandle for BitVector<N>
 where
     [(); (N - 1) / 32 + 1]:,
 {
+    //Safety: handle must NOT be dangling or null
     unsafe fn into_vpi_handle(self, handle: crate::vpi_user::vpiHandle) {
         use crate::vpi_user;
         let mut value = vpi_user::t_vpi_value {
@@ -126,16 +135,22 @@ where
         let mut ret = [vpi_user::t_vpi_vecval::default(); N];
 
         for (val, e) in ret.iter_mut().zip(self.0) {
-            val.aval = e as i32;
+            #[allow(clippy::useless_transmute)]
+            {
+                val.aval = core::mem::transmute(e);
+            }
         }
 
         value.value.vector = ret.as_mut_ptr();
 
-        vpi_user::vpi_put_value(
-            handle,
-            &mut value as *mut vpi_user::t_vpi_value,
-            core::ptr::null_mut(),
-            vpi_user::vpiNoDelay as i32,
-        );
+        //Safety: correct use of ffi function
+        unsafe {
+            vpi_user::vpi_put_value(
+                handle,
+                &mut value as *mut vpi_user::t_vpi_value,
+                core::ptr::null_mut(),
+                vpi_user::vpiNoDelay as i32,
+            );
+        }
     }
 }

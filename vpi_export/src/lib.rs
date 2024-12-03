@@ -2,6 +2,7 @@
 #![feature(associated_type_defaults)]
 #![allow(incomplete_features)]
 #![feature(generic_const_exprs)]
+#![feature(stmt_expr_attributes)]
 #![warn(missing_docs)]
 
 //! Vpi-export
@@ -57,6 +58,7 @@ impl<E> FromVpiHandle for Input<E>
 where
     E: FromVpiHandle,
 {
+    //Safety: handle must NOT be dangling or null
     unsafe fn from_vpi_handle(handle: vpi_user::vpiHandle) -> Result<Self> {
         Ok(Self {
             elem: E::from_vpi_handle(handle)?,
@@ -97,6 +99,7 @@ impl<E> FromVpiHandle for Output<E>
 where
     E: Default + IntoVpiHandle,
 {
+    //Safety: handle must NOT be dangling or null
     unsafe fn from_vpi_handle(handle: vpi_user::vpiHandle) -> Result<Self> {
         Ok(Self {
             handle,
@@ -148,6 +151,7 @@ impl<E> FromVpiHandle for InputOutput<E>
 where
     E: IntoVpiHandle + FromVpiHandle,
 {
+    //Safety: handle must NOT be dangling or null
     unsafe fn from_vpi_handle(handle: vpi_user::vpiHandle) -> Result<Self> {
         Ok(Self {
             handle,
@@ -162,9 +166,13 @@ where
 {
     fn drop(&mut self) {
         //just to replace
+        //Safety: handle is valid
         let replace = unsafe { FromVpiHandle::from_vpi_handle(self.handle) }.unwrap();
         let e = core::mem::replace(&mut self.elem, replace);
-        unsafe { IntoVpiHandle::into_vpi_handle(e, self.handle) };
+        //Safety: handle is valid
+        unsafe {
+            IntoVpiHandle::into_vpi_handle(e, self.handle);
+        }
     }
 }
 
@@ -189,6 +197,8 @@ pub type Result<T> = core::result::Result<T, VpiConversionError>;
 pub trait FromVpiHandle: Sized {
     ///Conversion function from verilog to rust. In implementation, use the function
     /// [crate::vpi_user::vpi_get_value] to obtain the value to convert.
+    /// # Safety
+    /// handle must NOT be dangling or null
     unsafe fn from_vpi_handle(handle: vpi_user::vpiHandle) -> Result<Self>;
 }
 
@@ -196,18 +206,20 @@ pub trait FromVpiHandle: Sized {
 pub trait IntoVpiHandle: Sized {
     ///Conversion function from rust to verilog. In implementation, use the function
     /// [crate::vpi_user::vpi_put_value] to conver type to verilog.
+    /// # Safety
+    /// handle must NOT be dangling or null
     unsafe fn into_vpi_handle(self, handle: vpi_user::vpiHandle);
 }
 
 ///Print function that internally will use the simulator's print function.
 pub fn print(c: &core::ffi::CStr) {
     unsafe {
-        vpi_user::vpi_printf(c.as_ptr() as *const core::ffi::c_char);
+        vpi_user::vpi_printf(c.as_ptr() as *mut core::ffi::c_char);
     }
 }
 
 ///Print function that internally will use the simulator's print function with an appended new line.
 pub fn println(c: &core::ffi::CStr) {
     print(c);
-    print(&unsafe { core::ffi::CStr::from_bytes_with_nul_unchecked(b"\n\0") });
+    print(unsafe { core::ffi::CStr::from_bytes_with_nul_unchecked(b"\n\0") });
 }
