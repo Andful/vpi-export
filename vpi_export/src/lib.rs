@@ -11,14 +11,11 @@
 
 #[doc(hidden)]
 pub mod __hidden__;
-
+pub use vpi_user;
 mod bitvec;
-
 mod impls;
-
-use core::ops::{Deref, DerefMut};
-
 pub use bitvec::BitVector;
+use core::ops::{Deref, DerefMut};
 pub use vpi_export_macro::{bitvec, vpi_task};
 pub use vpi_user::vpi_printf;
 

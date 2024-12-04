@@ -1,0 +1,12 @@
+[package]
+name = "vpi_examples"
+version = "0.1.0"
+edition = "2021"
+
+[[example]]
+name = "bitvec"
+path = "src/bitvec.rs"
+crate-type = ["cdylib"]
+
+[dependencies]
+vpi_export = { version = "0.1.5", path = "../vpi_export" }

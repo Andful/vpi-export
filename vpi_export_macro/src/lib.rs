@@ -58,7 +58,7 @@ pub fn vpi_task(_attr: TokenStream, item: TokenStream) -> TokenStream {
     let register_fm = quote! {
         const _: () = {
             use ::vpi_export::__hidden__::{
-                ctor, VpiFunctionCollection, VpiFunctionNode, VPI_FUNCTION_COLLECTION,
+                ctor, VpiFunctionNode, VPI_FUNCTION_COLLECTION,
             };
             use ::vpi_export::vpi_user::*;
 
@@ -66,7 +66,7 @@ pub fn vpi_task(_attr: TokenStream, item: TokenStream) -> TokenStream {
             fn ctor() {
                 static mut VPI_FUNCTION_NODE: VpiFunctionNode = VpiFunctionNode::new(init);
                 //SAFETY: this ctor function is called only once
-                VPI_FUNCTION_COLLECTION.push(unsafe { &mut VPI_FUNCTION_NODE });
+                unsafe {  VPI_FUNCTION_COLLECTION.push(::core::ptr::addr_of_mut!(VPI_FUNCTION_NODE)) };
             }
 
             pub fn init() {

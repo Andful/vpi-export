@@ -1,5 +1,5 @@
 [workspace]
-members = ["vpi_export", "vpi_export_macro", "vpi_user"]
+members = ["vpi_export", "vpi_export_macro", "vpi_user", "vpi_examples"]
 resolver = "2"
 
 [patch.crates-io]

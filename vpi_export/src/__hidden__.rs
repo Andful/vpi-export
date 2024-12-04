@@ -27,12 +27,11 @@ impl VpiFunctionCollection {
         }
     }
 
-    pub fn push(&self, vpi_function_node: &mut VpiFunctionNode) {
-        let next = self.head.swap(
-            vpi_function_node as *const VpiFunctionNode as *mut VpiFunctionNode,
-            Ordering::Relaxed,
-        );
-        vpi_function_node.next = next;
+    //SAFETY: unique access of vpi_function_node is required
+    pub unsafe fn push(&self, vpi_function_node: *mut VpiFunctionNode) {
+        let next = self.head.swap(vpi_function_node, Ordering::Relaxed);
+        //SAFETY: vpi_function_node is uniquely referenced
+        unsafe { &mut *vpi_function_node }.next = next;
     }
 }
 
