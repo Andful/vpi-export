@@ -9,10 +9,19 @@ repository = "https://github.com/Andful/vpi-export"
 homepage = "https://github.com/Andful/vpi-export"
 keywords = ["no_std", "verilog", "vpi", "ffi", "fpga"]
 categories = ["development-tools::ffi", "development-tools::debugging"]
-
+include = [
+    "/Cargo.toml",
+    "/README.md",
+    "/build.rs",
+    "/src/lib.rs",
+    "/repos/ghdl/src/grt/vpi_user.h",
+    "/repos/verilator/include/vltstd/vpi_user.h",
+    "/repos/iverilog/vpi_user.h",
+    "/repos/iverilog/_pli_types.h.in"
+]
 
 [features]
-default = ["ghdl"]
+default = ["verilator"]
 ghdl = []
 verilator = []
 iverilog = []

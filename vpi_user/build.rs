@@ -4,25 +4,11 @@ use std::{
 };
 
 fn iverilog(out_dir: &Path) {
-    use std::process::Command;
-
-    let o = Command::new("sh")
-        .args(["autoconf.sh"])
-        .current_dir(std::env::current_dir().unwrap().join("iverilog"))
-        .output()
-        .unwrap();
-    
-    assert!(o.status.success(), "{}", String::from_utf8(o.stderr).unwrap());
-
-        let o = Command::new("./configure")
-        .current_dir(std::env::current_dir().unwrap().join("iverilog"))
-        .output()
-        .unwrap();
-
-    assert!(o.status.success(), "{}", String::from_utf8(o.stderr).unwrap());
-
+    let repo = PathBuf::from("repos/iverilog");
+    std::fs::copy(repo.join("vpi_user.h"), out_dir.join("vpi_user.h")).unwrap();
+    std::fs::copy(repo.join("_pli_types.h.in"), out_dir.join("_pli_types.h")).unwrap();
     let bindings = bindgen::Builder::default()
-        .header("iverilog/vpi_user.h")
+        .header(out_dir.join("vpi_user.h").to_string_lossy())
         .use_core()
         .derive_default(true)
         .generate()
@@ -34,9 +20,8 @@ fn iverilog(out_dir: &Path) {
 }
 
 fn verilator(out_dir: &Path) {
-
     let bindings = bindgen::Builder::default()
-        .header("verilator/include/vltstd/vpi_user.h")
+        .header("repos/verilator/include/vltstd/vpi_user.h")
         .use_core()
         .derive_default(true)
         .generate()
@@ -47,11 +32,9 @@ fn verilator(out_dir: &Path) {
         .expect("Couldn't write bindings!");
 }
 
-
 fn ghdl(out_dir: &Path) {
-
     let bindings = bindgen::Builder::default()
-        .header("ghdl/src/grt/vpi_user.h")
+        .header("repos/ghdl/src/grt/vpi_user.h")
         .use_core()
         .derive_default(true)
         .generate()
@@ -64,11 +47,11 @@ fn ghdl(out_dir: &Path) {
 
 fn main() {
     let out_dir = PathBuf::from(env::var_os("OUT_DIR").unwrap());
-    if cfg!(feature = "verilator") {
-        verilator(&out_dir);
+    if cfg!(feature = "ghdl") {
+        ghdl(&out_dir);
     } else if cfg!(feature = "iverilog") {
         iverilog(&out_dir);
     } else {
-        ghdl(&out_dir);
+        verilator(&out_dir);
     }
 }
