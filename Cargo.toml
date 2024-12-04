@@ -1,6 +1,7 @@
 [workspace]
-members = ["vpi_export", "vpi_export_macro"]
+members = ["vpi_export", "vpi_export_macro", "vpi_user"]
 resolver = "2"
 
 [patch.crates-io]
 vpi_export_macro = { path = "./vpi_export_macro" }
+vpi_user = { path = "./vpi_user" }

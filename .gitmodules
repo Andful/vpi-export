@@ -1,0 +1,9 @@
+[submodule "vpi_user/iverilog"]
+	path = vpi_user/iverilog
+	url = https://github.com/steveicarus/iverilog.git
+[submodule "vpi_user/ghdl"]
+	path = vpi_user/ghdl
+	url = https://github.com/ghdl/ghdl.git
+[submodule "vpi_user/verilator"]
+	path = vpi_user/verilator
+	url = https://github.com/verilator/verilator.git

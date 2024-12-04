@@ -10,10 +10,6 @@
 //! Allows exporting of rust functions as VPI functions
 
 #[doc(hidden)]
-#[allow(non_camel_case_types, non_upper_case_globals, non_snake_case)]
-pub mod vpi_user;
-
-#[doc(hidden)]
 pub mod __hidden__;
 
 mod bitvec;

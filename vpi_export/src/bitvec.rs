@@ -91,9 +91,8 @@ impl<const N: usize> FromVpiHandle for BitVector<N>
 where
     [(); (N - 1) / 32 + 1]:,
 {
-    //Safety: handle must NOT be dangling or null
-    unsafe fn from_vpi_handle(handle: crate::vpi_user::vpiHandle) -> crate::Result<Self> {
-        use crate::vpi_user;
+    unsafe fn from_vpi_handle(handle: vpi_user::vpiHandle) -> crate::Result<Self> {
+        use vpi_user;
         let mut value = vpi_user::t_vpi_value {
             format: vpi_user::vpiVectorVal as i32,
             ..Default::default()
@@ -125,9 +124,8 @@ impl<const N: usize> IntoVpiHandle for BitVector<N>
 where
     [(); (N - 1) / 32 + 1]:,
 {
-    //Safety: handle must NOT be dangling or null
-    unsafe fn into_vpi_handle(self, handle: crate::vpi_user::vpiHandle) {
-        use crate::vpi_user;
+    unsafe fn into_vpi_handle(self, handle: vpi_user::vpiHandle) {
+        use vpi_user;
         let mut value = vpi_user::t_vpi_value {
             format: vpi_user::vpiVectorVal as i32,
             ..Default::default()

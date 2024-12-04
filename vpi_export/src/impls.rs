@@ -1,4 +1,4 @@
-use crate::{vpi_user, FromVpiHandle, IntoVpiHandle, Result, VpiConversionError};
+use crate::{FromVpiHandle, IntoVpiHandle, Result, VpiConversionError};
 
 macro_rules! impl_from_vpi_handle {
     ($t:ty) => {
