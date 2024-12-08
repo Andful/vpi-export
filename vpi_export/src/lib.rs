@@ -1,8 +1,6 @@
 #![no_std]
-#![feature(associated_type_defaults)]
 #![allow(incomplete_features)]
 #![feature(generic_const_exprs)]
-#![feature(stmt_expr_attributes)]
 #![warn(missing_docs)]
 
 //! Vpi-export
@@ -14,159 +12,30 @@ pub mod __hidden__;
 pub use vpi_user;
 mod bitvec;
 mod impls;
+mod marker;
 pub use bitvec::BitVector;
-use core::ops::{Deref, DerefMut};
+pub use marker::{input::Input, input_output::InputOutput, output::Output};
 pub use vpi_export_macro::{bitvec, vpi_task};
 pub use vpi_user::vpi_printf;
 
-/// Mark a value as `input`. Changes on this argument will have no effect on
-/// the task. This is equivalent as using the argument `E`
-pub struct Input<E>
-where
-    E: FromVpiHandle,
-{
-    elem: E,
+mod __private {
+    pub trait Sealed {}
 }
 
-impl<E> Deref for Input<E>
-where
-    E: FromVpiHandle,
-{
-    type Target = E;
-    fn deref(&self) -> &Self::Target {
-        &self.elem
-    }
-}
-
-impl<E> DerefMut for Input<E>
-where
-    E: FromVpiHandle,
-{
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.elem
-    }
-}
-
-impl<E> FromVpiHandle for Input<E>
-where
-    E: FromVpiHandle,
-{
-    //Safety: handle must NOT be dangling or null
-    unsafe fn from_vpi_handle(handle: vpi_user::vpiHandle) -> Result<Self> {
-        Ok(Self {
-            elem: E::from_vpi_handle(handle)?,
-        })
-    }
-}
-
-/// Mark a value as `output`. Its value will default to [Default::default]. Changes
-/// will update argument to the set value at the end of the function call.
-pub struct Output<E>
-where
-    E: Default + IntoVpiHandle,
-{
-    handle: vpi_user::vpiHandle,
-    elem: E,
-}
-
-impl<E> Deref for Output<E>
-where
-    E: Default + IntoVpiHandle,
-{
-    type Target = E;
-    fn deref(&self) -> &Self::Target {
-        &self.elem
-    }
-}
-
-impl<E> DerefMut for Output<E>
-where
-    E: Default + IntoVpiHandle,
-{
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.elem
-    }
-}
-
-impl<E> FromVpiHandle for Output<E>
-where
-    E: Default + IntoVpiHandle,
-{
-    //Safety: handle must NOT be dangling or null
-    unsafe fn from_vpi_handle(handle: vpi_user::vpiHandle) -> Result<Self> {
-        Ok(Self {
-            handle,
-            elem: E::default(),
-        })
-    }
-}
-
-impl<E> Drop for Output<E>
-where
-    E: Default + IntoVpiHandle,
-{
-    fn drop(&mut self) {
-        let e = core::mem::take(&mut self.elem);
-        unsafe { IntoVpiHandle::into_vpi_handle(e, self.handle) };
-    }
-}
-
-/// Mark a value as `inout`. Changes
-/// will update argument to the set value at the end of the function call.
-pub struct InputOutput<E>
-where
-    E: IntoVpiHandle + FromVpiHandle,
-{
-    handle: vpi_user::vpiHandle,
-    elem: E,
-}
-
-impl<E> Deref for InputOutput<E>
-where
-    E: IntoVpiHandle + FromVpiHandle,
-{
-    type Target = E;
-    fn deref(&self) -> &Self::Target {
-        &self.elem
-    }
-}
-
-impl<E> DerefMut for InputOutput<E>
-where
-    E: IntoVpiHandle + FromVpiHandle,
-{
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.elem
-    }
-}
-
-impl<E> FromVpiHandle for InputOutput<E>
-where
-    E: IntoVpiHandle + FromVpiHandle,
-{
-    //Safety: handle must NOT be dangling or null
-    unsafe fn from_vpi_handle(handle: vpi_user::vpiHandle) -> Result<Self> {
-        Ok(Self {
-            handle,
-            elem: E::from_vpi_handle(handle)?,
-        })
-    }
-}
-
-impl<E> Drop for InputOutput<E>
-where
-    E: IntoVpiHandle + FromVpiHandle,
-{
-    fn drop(&mut self) {
-        //just to replace
-        //Safety: handle is valid
-        let replace = unsafe { FromVpiHandle::from_vpi_handle(self.handle) }.unwrap();
-        let e = core::mem::replace(&mut self.elem, replace);
-        //Safety: handle is valid
-        unsafe {
-            IntoVpiHandle::into_vpi_handle(e, self.handle);
-        }
-    }
+/// Trait required for vpi task arguments
+pub trait VpiTaskArg<'a>: __private::Sealed {
+    ///Argument to keep in the stack when initializing VpiTaskArg.
+    type Data;
+    /// # Safety
+    ///
+    /// Handle must not be null or dangling
+    unsafe fn initialize_data(handle: vpi_user::vpiHandle) -> Result<Self::Data>;
+    ///Initializer
+    fn new(e: &'a mut Self::Data) -> Self;
+    /// # Safety
+    ///
+    /// Handle must not be null or dangling
+    unsafe fn finalize_data(e: Self::Data, handle: vpi_user::vpiHandle) -> Result<()>;
 }
 
 ///Error due to conversion from verilog type to rust type
@@ -201,7 +70,7 @@ pub trait IntoVpiHandle: Sized {
     /// [crate::vpi_user::vpi_put_value] to conver type to verilog.
     /// # Safety
     /// handle must NOT be dangling or null
-    unsafe fn into_vpi_handle(self, handle: vpi_user::vpiHandle);
+    unsafe fn into_vpi_handle(self, handle: vpi_user::vpiHandle) -> Result<()>;
 }
 
 ///Print function that internally will use the simulator's print function.

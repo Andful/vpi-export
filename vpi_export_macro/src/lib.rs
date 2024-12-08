@@ -9,26 +9,32 @@ use syn::{
     LitStr, PatType, Signature,
 };
 
-fn arg_instantiation_impl(arg: &FnArg, arg_ident: Ident) -> proc_macro2::TokenStream {
+fn arg_initialization_impl(arg: &FnArg, index: usize) -> proc_macro2::TokenStream {
+    let data_ident = Ident::new(&format!("data_{index}"), Span::call_site());
+    let arg_ident = Ident::new(&format!("arg_{index}"), Span::call_site());
+    let handle_ident = Ident::new(&format!("handle_{index}"), Span::call_site());
     match arg {
         FnArg::Typed(PatType { ty, .. }) => quote! {
-            let handle = vpi_scan(args_iter);
-            if handle == ::core::ptr::null_mut() {
+            let #handle_ident = vpi_scan(args_iter);
+            if #handle_ident == ::core::ptr::null_mut() {
                 panic!("not enough arguments");
             }
-            let #arg_ident: #ty = vpi_export::FromVpiHandle::from_vpi_handle(handle).unwrap();
+            let mut #data_ident = <#ty as vpi_export::VpiTaskArg>::initialize_data(#handle_ident).unwrap();
+            let #arg_ident = <#ty as vpi_export::VpiTaskArg>::new(&mut #data_ident);
         },
         _ => panic!("Only functions supported"),
     }
 }
 
-fn args_instantiation_impl(args: &Punctuated<FnArg, Comma>) -> proc_macro2::TokenStream {
-    let args = args
-        .iter()
-        .enumerate()
-        .map(|(i, e)| arg_instantiation_impl(e, Ident::new(&format!("arg_{i}"), Span::call_site())))
-        .collect::<Vec<_>>();
-    quote! { #(#args)* }
+fn arg_finalization_impl(arg: &FnArg, index: usize) -> proc_macro2::TokenStream {
+    let data_ident = Ident::new(&format!("data_{index}"), Span::call_site());
+    let handle_ident = Ident::new(&format!("handle_{index}"), Span::call_site());
+    match arg {
+        FnArg::Typed(PatType { ty, .. }) => quote! {
+            unsafe { <#ty as vpi_export::VpiTaskArg>::finalize_data(#data_ident, #handle_ident) }.unwrap();
+        },
+        _ => panic!("Only functions supported"),
+    }
 }
 
 fn args_impl(args: &Punctuated<FnArg, Comma>) -> proc_macro2::TokenStream {
@@ -53,7 +59,17 @@ pub fn vpi_task(_attr: TokenStream, item: TokenStream) -> TokenStream {
         proc_macro2::Span::call_site(),
     );
     let args = args_impl(&inputs);
-    let args_instantiation = args_instantiation_impl(&inputs);
+    let args_initialization = inputs
+        .iter()
+        .enumerate()
+        .map(|(i, e)| arg_initialization_impl(e, i))
+        .collect::<Vec<_>>();
+
+    let args_finalization = inputs
+        .iter()
+        .enumerate()
+        .map(|(i, e)| arg_finalization_impl(e, i))
+        .collect::<Vec<_>>();
 
     let register_fm = quote! {
         const _: () = {
@@ -66,7 +82,7 @@ pub fn vpi_task(_attr: TokenStream, item: TokenStream) -> TokenStream {
             fn ctor() {
                 static mut VPI_FUNCTION_NODE: VpiFunctionNode = VpiFunctionNode::new(init);
                 //SAFETY: this ctor function is called only once
-                unsafe {  VPI_FUNCTION_COLLECTION.push(::core::ptr::addr_of_mut!(VPI_FUNCTION_NODE)) };
+                VPI_FUNCTION_COLLECTION.push(unsafe {  &mut *::core::ptr::addr_of_mut!(VPI_FUNCTION_NODE) });
             }
 
             pub fn init() {
@@ -87,8 +103,9 @@ pub fn vpi_task(_attr: TokenStream, item: TokenStream) -> TokenStream {
                 let systfref = vpi_handle(vpiSysTfCall as PLI_INT32, ::core::ptr::null_mut());
                 let args_iter = vpi_iterate(vpiArgument as PLI_INT32, systfref);
                 {
-                    #args_instantiation
+                    #(#args_initialization)*
                     #fn_ident(#args);
+                    #(#args_finalization)*
                 }
                 if args_iter != ::core::ptr::null_mut(){
                     vpi_free_object(args_iter);

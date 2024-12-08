@@ -18,7 +18,7 @@ macro_rules! impl_from_vpi_handle {
 macro_rules! impl_into_vpi_handle {
     ($t:ty) => {
         impl IntoVpiHandle for $t {
-            unsafe fn into_vpi_handle(self, handle: vpi_user::vpiHandle) {
+            unsafe fn into_vpi_handle(self, handle: vpi_user::vpiHandle) -> Result<()> {
                 let mut value = vpi_user::t_vpi_value {
                     format: vpi_user::vpiIntVal as i32,
                     ..Default::default()
@@ -30,6 +30,7 @@ macro_rules! impl_into_vpi_handle {
                     core::ptr::null_mut(),
                     vpi_user::vpiNoDelay as i32,
                 );
+                Ok(())
             }
         }
     };
@@ -56,13 +57,13 @@ impl_into_vpi_handle!(u32);
 impl_into_vpi_handle!(u64);
 
 impl IntoVpiHandle for () {
-    unsafe fn into_vpi_handle(self, _handle: vpi_user::vpiHandle) {
-        //do nothing
+    unsafe fn into_vpi_handle(self, _handle: vpi_user::vpiHandle) -> Result<()> {
+        Ok(())
     }
 }
 
 impl IntoVpiHandle for f32 {
-    unsafe fn into_vpi_handle(self, handle: vpi_user::vpiHandle) {
+    unsafe fn into_vpi_handle(self, handle: vpi_user::vpiHandle) -> Result<()> {
         let mut value = vpi_user::t_vpi_value {
             format: vpi_user::vpiRealVal as i32,
             ..Default::default()
@@ -74,6 +75,7 @@ impl IntoVpiHandle for f32 {
             core::ptr::null_mut(),
             vpi_user::vpiNoDelay as i32,
         );
+        Ok(())
     }
 }
 
@@ -96,7 +98,7 @@ impl FromVpiHandle for &core::ffi::CStr {
 }
 
 impl IntoVpiHandle for &core::ffi::CStr {
-    unsafe fn into_vpi_handle(self, handle: vpi_user::vpiHandle) {
+    unsafe fn into_vpi_handle(self, handle: vpi_user::vpiHandle) -> Result<()> {
         let mut value = vpi_user::t_vpi_value {
             format: vpi_user::vpiStringVal as i32,
             ..Default::default()
@@ -108,5 +110,6 @@ impl IntoVpiHandle for &core::ffi::CStr {
             core::ptr::null_mut(),
             vpi_user::vpiNoDelay as i32,
         );
+        Ok(())
     }
 }
