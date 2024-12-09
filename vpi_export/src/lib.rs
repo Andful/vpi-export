@@ -11,10 +11,10 @@
 pub mod __hidden__;
 pub use vpi_user;
 mod bitvec;
+mod handle;
 mod impls;
-mod marker;
+mod vpi_iter;
 pub use bitvec::BitVector;
-pub use marker::{input::Input, input_output::InputOutput, output::Output};
 pub use vpi_export_macro::{bitvec, vpi_task};
 pub use vpi_user::vpi_printf;
 
@@ -22,20 +22,13 @@ mod __private {
     pub trait Sealed {}
 }
 
+pub use handle::Handle;
+pub use vpi_iter::VpiIter;
+
 /// Trait required for vpi task arguments
-pub trait VpiTaskArg<'a>: __private::Sealed {
-    ///Argument to keep in the stack when initializing VpiTaskArg.
-    type Data;
-    /// # Safety
-    ///
-    /// Handle must not be null or dangling
-    unsafe fn initialize_data(handle: vpi_user::vpiHandle) -> Result<Self::Data>;
-    ///Initializer
-    fn new(e: &'a mut Self::Data) -> Self;
-    /// # Safety
-    ///
-    /// Handle must not be null or dangling
-    unsafe fn finalize_data(e: Self::Data, handle: vpi_user::vpiHandle) -> Result<()>;
+pub trait VpiTaskArg: FromVpiHandle + __private::Sealed {}
+pub trait VpiTaskResult: __private::Sealed {
+    fn into_vpi_result(self) -> Result<()>;
 }
 
 ///Error due to conversion from verilog type to rust type
@@ -70,7 +63,12 @@ pub trait IntoVpiHandle: Sized {
     /// [crate::vpi_user::vpi_put_value] to conver type to verilog.
     /// # Safety
     /// handle must NOT be dangling or null
-    unsafe fn into_vpi_handle(self, handle: vpi_user::vpiHandle) -> Result<()>;
+    unsafe fn into_vpi_handle(&self, handle: vpi_user::vpiHandle) -> Result<()>;
+}
+
+///Register callback
+pub fn on_value_change<'a, Arg: VpiTaskArg>(value: &Arg) {
+    todo!()
 }
 
 ///Print function that internally will use the simulator's print function.

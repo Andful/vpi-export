@@ -124,7 +124,7 @@ impl<const N: usize> IntoVpiHandle for BitVector<N>
 where
     [(); (N - 1) / 32 + 1]:,
 {
-    unsafe fn into_vpi_handle(self, handle: vpi_user::vpiHandle) -> crate::Result<()> {
+    unsafe fn into_vpi_handle(&self, handle: vpi_user::vpiHandle) -> crate::Result<()> {
         use vpi_user;
         let mut value = vpi_user::t_vpi_value {
             format: vpi_user::vpiVectorVal as i32,

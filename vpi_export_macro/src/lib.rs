@@ -10,28 +10,10 @@ use syn::{
 };
 
 fn arg_initialization_impl(arg: &FnArg, index: usize) -> proc_macro2::TokenStream {
-    let data_ident = Ident::new(&format!("data_{index}"), Span::call_site());
     let arg_ident = Ident::new(&format!("arg_{index}"), Span::call_site());
-    let handle_ident = Ident::new(&format!("handle_{index}"), Span::call_site());
     match arg {
         FnArg::Typed(PatType { ty, .. }) => quote! {
-            let #handle_ident = vpi_scan(args_iter);
-            if #handle_ident == ::core::ptr::null_mut() {
-                panic!("not enough arguments");
-            }
-            let mut #data_ident = <#ty as vpi_export::VpiTaskArg>::initialize_data(#handle_ident).unwrap();
-            let #arg_ident = <#ty as vpi_export::VpiTaskArg>::new(&mut #data_ident);
-        },
-        _ => panic!("Only functions supported"),
-    }
-}
-
-fn arg_finalization_impl(arg: &FnArg, index: usize) -> proc_macro2::TokenStream {
-    let data_ident = Ident::new(&format!("data_{index}"), Span::call_site());
-    let handle_ident = Ident::new(&format!("handle_{index}"), Span::call_site());
-    match arg {
-        FnArg::Typed(PatType { ty, .. }) => quote! {
-            unsafe { <#ty as vpi_export::VpiTaskArg>::finalize_data(#data_ident, #handle_ident) }.unwrap();
+            let #arg_ident = unsafe { <#ty as vpi_export::FromVpiHandle>::from_vpi_handle(args_iter.next().unwrap()) }?;
         },
         _ => panic!("Only functions supported"),
     }
@@ -65,12 +47,6 @@ pub fn vpi_task(_attr: TokenStream, item: TokenStream) -> TokenStream {
         .map(|(i, e)| arg_initialization_impl(e, i))
         .collect::<Vec<_>>();
 
-    let args_finalization = inputs
-        .iter()
-        .enumerate()
-        .map(|(i, e)| arg_finalization_impl(e, i))
-        .collect::<Vec<_>>();
-
     let register_fm = quote! {
         const _: () = {
             use ::vpi_export::__hidden__::{
@@ -90,7 +66,7 @@ pub fn vpi_task(_attr: TokenStream, item: TokenStream) -> TokenStream {
                 let mut task_data_p = s_vpi_systf_data {
                     type_: vpiSysTask as PLI_INT32,
                     tfname: func_name_ptr,
-                    calltf: Some(wrapper),
+                    calltf: Some(raw_wrapper),
                     ..Default::default()
                 };
                 //SAFETY: correct usage of function
@@ -99,19 +75,23 @@ pub fn vpi_task(_attr: TokenStream, item: TokenStream) -> TokenStream {
                 }
             }
 
-            unsafe extern "C" fn wrapper(_user_data: *mut vpi_export::vpi_user::PLI_BYTE8) -> vpi_export::vpi_user::PLI_INT32 {
-                let systfref = vpi_handle(vpiSysTfCall as PLI_INT32, ::core::ptr::null_mut());
-                let args_iter = vpi_iterate(vpiArgument as PLI_INT32, systfref);
+            fn wrapper() -> vpi_export::Result<()> {
+                let systfref = unsafe { vpi_handle(vpiSysTfCall as PLI_INT32, ::core::ptr::null_mut()) };
+                //Safety: systfref is not null or dangling
+                let mut args_iter = unsafe { vpi_export::VpiIter::new(vpiArgument as PLI_INT32, systfref) };
                 {
                     #(#args_initialization)*
-                    #fn_ident(#args);
-                    #(#args_finalization)*
+                    let res = #fn_ident(#args);
+                    vpi_export::VpiTaskResult::into_vpi_result(res)?
                 }
-                if args_iter != ::core::ptr::null_mut(){
-                    vpi_free_object(args_iter);
-                }
+                Ok(())
+            }
+
+            unsafe extern "C" fn raw_wrapper(_user_data: *mut vpi_export::vpi_user::PLI_BYTE8) -> vpi_export::vpi_user::PLI_INT32 {
+                wrapper().unwrap();
                 0
             }
+
         };
     };
     quote! {
