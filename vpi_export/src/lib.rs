@@ -99,7 +99,7 @@ pub fn on_value_change<'a, E: FromVpiHandle, F: FnMut() -> () + Sized + 'static>
         callback.write(f);
     }
     let data_layout = Layout::new::<CallbackData>();
-    let data = unsafe { alloc(callback_layout) } as *mut CallbackData;
+    let data = unsafe { alloc(data_layout) } as *mut CallbackData;
     unsafe {
         data.write(CallbackData {
             handle: null_mut(),
