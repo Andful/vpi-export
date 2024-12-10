@@ -12,5 +12,8 @@ fn bitvec(
         .clone()
         .concat((*b.as_ref().unwrap()).clone())
         .into();
+    vpi_export::on_value_change(&b, || {
+        println!("Hello");
+    });
     Ok(())
 }

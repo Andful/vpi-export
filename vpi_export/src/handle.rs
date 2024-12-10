@@ -1,13 +1,13 @@
 use core::ops::{Deref, DerefMut};
 
-use crate::{FromVpiHandle, IntoVpiHandle, VpiTaskArg};
+use crate::{FromVpiHandle, IntoVpiHandle};
 
 ///Handle
 pub struct Handle<E>
 where
     E: FromVpiHandle,
 {
-    handle: crate::vpi_user::vpiHandle,
+    pub(crate) handle: crate::vpi_user::vpiHandle,
     element: E,
     pd: core::marker::PhantomData<E>,
 }
@@ -94,5 +94,3 @@ where
         })
     }
 }
-
-impl<E> VpiTaskArg for Handle<E> where E: FromVpiHandle {}

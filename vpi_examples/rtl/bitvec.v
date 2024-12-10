@@ -5,5 +5,9 @@ module main;
   initial begin
     $bitvec(a, b, conc);
     $display("%b %b %b", a, b, conc);
+    #10 b = 2'b11;
+    $display("%b %b %b", a, b, conc);
+    #10 b = 2'b00;
+    $display("%b %b %b", a, b, conc);
   end
 endmodule
