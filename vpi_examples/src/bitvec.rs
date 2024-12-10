@@ -12,7 +12,8 @@ fn bitvec(
         .clone()
         .concat((*b.as_ref().unwrap()).clone())
         .into();
-    vpi_export::on_value_change(&b, || {
+    vpi_export::on_value_change(&b, move || {
+        *a.as_mut().unwrap() = bitvec!("30'b010");
         println!("Hello");
     });
     Ok(())

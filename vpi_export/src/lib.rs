@@ -128,7 +128,8 @@ pub fn on_value_change<'a, E: FromVpiHandle, F: FnMut() -> () + Sized + 'static>
 }
 
 pub fn remove_cb(cb_handle: VpiCallbackHandle) {
-    //TODO free data
+    //TODO free data even though there does not seem to be a sensible way of doing it
+    //Data is shared with the simulator
     unsafe { vpi_user::vpi_remove_cb(cb_handle.0) };
 }
 

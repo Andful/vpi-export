@@ -4,7 +4,7 @@ module main;
   reg [31:0] conc  = {32'b0};
   initial begin
     $bitvec(a, b, conc);
-    $display("%b %b %b", a, b, conc);
+    #10 $display("%b %b %b", a, b, conc);
     #10 b = 2'b11;
     $display("%b %b %b", a, b, conc);
     #10 b = 2'b00;
