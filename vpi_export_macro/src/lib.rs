@@ -6,7 +6,7 @@ use proc_macro2::{self, Span};
 use quote::quote;
 use syn::{
     parse_macro_input, punctuated::Punctuated, token::Comma, FnArg, Ident, ItemFn, LitByteStr,
-    LitStr, PatType, Signature,
+    LitStr, PatType, Signature, Token,
 };
 
 fn arg_initialization_impl(arg: &FnArg, index: usize) -> proc_macro2::TokenStream {
@@ -24,6 +24,87 @@ fn args_impl(args: &Punctuated<FnArg, Comma>) -> proc_macro2::TokenStream {
         .map(|i| Ident::new(&format!("arg_{i}"), Span::call_site()))
         .collect();
     quote! { #result }
+}
+
+/// Export function as a vpi task
+#[proc_macro_attribute]
+pub fn vpi_module(attr: TokenStream, item: TokenStream) -> TokenStream {
+    let attr = attr.to_string();
+    let function = parse_macro_input!(item as ItemFn);
+    let ItemFn { sig, .. } = function.clone();
+    let Signature {
+        ident: fn_ident,
+        inputs,
+        ..
+    } = sig;
+    let module_name_literal = LitByteStr::new(
+        format!("{}\0", attr).as_bytes(),
+        proc_macro2::Span::call_site(),
+    );
+    let args = args_impl(&inputs);
+    let args_initialization = inputs
+        .iter()
+        .enumerate()
+        .map(|(i, e)| arg_initialization_impl(e, i))
+        .collect::<Vec<_>>();
+
+    let register_fm = quote! {
+        const _: () = {
+            use ::vpi_export::__hidden__::{
+                ctor, VpiFunctionNode, VPI_FUNCTION_COLLECTION,
+            };
+            use ::vpi_export::vpi_user::*;
+
+            #[ctor]
+            fn ctor() {
+                static mut VPI_FUNCTION_NODE: VpiFunctionNode = VpiFunctionNode::new(init);
+                //SAFETY: this ctor function is called only once
+                VPI_FUNCTION_COLLECTION.push(unsafe {  &mut *::core::ptr::addr_of_mut!(VPI_FUNCTION_NODE) });
+            }
+
+            pub fn init() {
+                let module_name_ptr = #module_name_literal.as_ptr() as *mut ::core::ffi::c_char;
+                let mut cb_data = t_cb_data {
+                        reason: cbStartOfSimulation as i32,
+                        cb_rtn: Some(raw_wrapper),
+                        obj: core::ptr::null_mut(),
+                        user_data: core::ptr::null_mut(),
+                        ..Default::default()
+                    };
+
+                //SAFETY: correct usage of function
+                unsafe {
+                    vpi_export::vpi_user::vpi_register_cb(&mut cb_data);
+                }
+            }
+
+            fn wrapper() -> vpi_export::Result<()> {
+                let module = unsafe { vpi_handle_by_name(#module_name_literal.as_ptr() as *mut ::core::ffi::c_char, ::core::ptr::null_mut()) };
+                if module.is_null() {
+                    return Err(vpi_export::VpiConversionError::NoModule(core::ffi::CStr::from_bytes_with_nul(#module_name_literal).unwrap()))
+                }
+                //Safety: systfref is not null or dangling
+                let mut args_iter = unsafe { vpi_export::VpiIter::new(vpiNet as PLI_INT32, module) };
+                {
+                    #(#args_initialization)*
+                    let res = #fn_ident(#args);
+                    vpi_export::VpiTaskResult::into_vpi_result(res)?
+                }
+                Ok(())
+            }
+
+            unsafe extern "C" fn raw_wrapper(_user_data: *mut vpi_export::vpi_user::t_cb_data) -> vpi_export::vpi_user::PLI_INT32 {
+                wrapper().unwrap();
+                0
+            }
+
+        };
+    };
+    quote! {
+        #register_fm
+        #function
+    }
+    .into()
 }
 
 /// Export function as a vpi task

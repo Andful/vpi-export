@@ -101,7 +101,7 @@ where
         //Safety: correct use of ffi
         let size = unsafe { vpi_user::vpi_get(vpi_user::vpiSize as i32, handle) } as usize;
         if size != N {
-            return Err(VpiConversionError::BitVectorMissMatch {
+            return Err(VpiConversionError::BitVectorLengthMissMatch {
                 expected: N,
                 actual: size as usize,
             });

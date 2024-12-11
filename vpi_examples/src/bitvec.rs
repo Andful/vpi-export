@@ -1,4 +1,28 @@
-use vpi_export::{bitvec, vpi_task, BitVector, Handle};
+use vpi_export::{bitvec, get_time, on_delay, vpi_module, vpi_task, BitVector, Handle};
+
+#[vpi_module(main)]
+fn top(mut clk: Handle<BitVector<1>>) {
+    on_delay(100, || {
+        looping(0, clk);
+    });
+}
+
+fn looping(i: u64, mut clk: Handle<BitVector<1>>) {
+    if i > 100 {
+        return;
+    }
+    {
+        *clk.as_mut().unwrap() = if i % 2 == 0 {
+            bitvec!("1'b0")
+        } else {
+            bitvec!("1'b1")
+        };
+    }
+    println!("Tick {}", get_time());
+    on_delay(100, move || {
+        looping(i + 1, clk);
+    });
+}
 
 #[vpi_task]
 fn bitvec(

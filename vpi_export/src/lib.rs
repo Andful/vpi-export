@@ -11,7 +11,10 @@ extern crate alloc;
 
 #[doc(hidden)]
 pub mod __hidden__;
-use core::{ffi::{c_void, CStr}, ptr::null_mut};
+use core::{
+    ffi::{c_void, CStr},
+    ptr::null_mut,
+};
 
 pub use vpi_user;
 mod bitvec;
@@ -19,8 +22,9 @@ mod handle;
 mod impls;
 mod vpi_iter;
 pub use bitvec::BitVector;
-pub use vpi_export_macro::{bitvec, vpi_task};
+pub use vpi_export_macro::{bitvec, vpi_module, vpi_task};
 pub use vpi_user::vpi_printf;
+use vpi_user::{t_cb_data, vpiSimTime, vpi_get_time};
 
 mod __private {
     pub trait Sealed {}
@@ -38,8 +42,9 @@ pub trait VpiTaskResult: __private::Sealed {
 pub enum VpiConversionError {
     ///String conversion error from verilog to rust
     Utf8Error(core::str::Utf8Error),
+    NoModule(&'static CStr),
     ///Vector length missmat
-    BitVectorMissMatch {
+    BitVectorLengthMissMatch {
         ///Expected length
         expected: usize,
         ///Obtained length
@@ -69,16 +74,14 @@ pub trait IntoVpiHandle: Sized {
 }
 
 unsafe extern "C" fn cb(data: *mut vpi_user::t_cb_data) -> i32 {
-
-    let data = unsafe {&mut *data};
+    let data = unsafe { &mut *data };
     let data = unsafe { &mut *(data.user_data as *mut CallbackData) };
-    let f = unsafe {&mut *data.callback};
+    let f = unsafe { &mut *data.callback };
     f();
     0
 }
 
 struct CallbackData {
-    handle: vpi_user::vpiHandle,
     raw_callback_pointer: *mut u8,
     callback: *mut dyn FnMut() -> (),
     callback_layout: alloc::alloc::Layout,
@@ -87,7 +90,10 @@ struct CallbackData {
 pub struct VpiCallbackHandle(vpi_user::vpiHandle);
 
 ///Register callback
-pub fn on_value_change<'a, E: FromVpiHandle, F: FnMut() -> () + Sized + 'static>(value: &Handle<E>, f: F) -> VpiCallbackHandle {
+pub fn on_value_change<E: FromVpiHandle, F: FnMut() -> () + Sized + 'static>(
+    value: &Handle<E>,
+    f: F,
+) -> VpiCallbackHandle {
     use alloc::alloc::{alloc, handle_alloc_error, Layout};
     let callback_layout = Layout::new::<F>();
     let raw_callback_pointer = unsafe { alloc(callback_layout) };
@@ -102,29 +108,78 @@ pub fn on_value_change<'a, E: FromVpiHandle, F: FnMut() -> () + Sized + 'static>
     let data = unsafe { alloc(data_layout) } as *mut CallbackData;
     unsafe {
         data.write(CallbackData {
-            handle: null_mut(),
             raw_callback_pointer,
             callback,
             callback_layout,
         });
     }
-    let cb_data_layout = Layout::new::<vpi_user::t_cb_data>();
-    let cb_data = unsafe { alloc(cb_data_layout) } as *mut vpi_user::t_cb_data;
-    if cb_data.is_null() {
-        handle_alloc_error(cb_data_layout);
+    let mut cb_data = vpi_user::t_cb_data {
+        reason: vpi_user::cbValueChange as i32,
+        cb_rtn: Some(cb),
+        obj: value.handle,
+        user_data: data as *mut vpi_user::PLI_BYTE8,
+        ..Default::default()
+    };
+    VpiCallbackHandle(unsafe { vpi_user::vpi_register_cb(&mut cb_data) })
+}
+
+fn on_delay_internal<F: FnMut() -> () + Sized + 'static>(delay: u64, f: F) -> VpiCallbackHandle {
+    use alloc::alloc::{alloc, handle_alloc_error, Layout};
+    let callback_layout = Layout::new::<F>();
+    let raw_callback_pointer = unsafe { alloc(callback_layout) };
+    let callback = raw_callback_pointer as *mut F;
+    if callback.is_null() {
+        handle_alloc_error(callback_layout);
     }
     unsafe {
-        cb_data.write(vpi_user::t_cb_data {
-            reason: vpi_user::cbValueChange as i32,
-            cb_rtn: Some(cb),
-            obj: value.handle,
-            user_data: data as *mut vpi_user::PLI_BYTE8,
-            ..Default::default()
+        callback.write(f);
+    }
+    let data_layout = Layout::new::<CallbackData>();
+    let data = unsafe { alloc(data_layout) } as *mut CallbackData;
+    unsafe {
+        data.write(CallbackData {
+            raw_callback_pointer,
+            callback,
+            callback_layout,
         });
     }
-    VpiCallbackHandle(unsafe {
-        vpi_user::vpi_register_cb(cb_data)
+
+    let mut cb_data = vpi_user::t_cb_data {
+        reason: vpi_user::cbAfterDelay as i32,
+        cb_rtn: Some(cb),
+        time: &mut vpi_user::t_vpi_time {
+            type_: vpiSimTime as i32,
+            high: (delay >> 32) as u32,
+            low: (delay & ((!0u64) >> 32)) as u32,
+            ..Default::default()
+        },
+        user_data: data as *mut vpi_user::PLI_BYTE8,
+        ..Default::default()
+    };
+    VpiCallbackHandle(unsafe { vpi_user::vpi_register_cb(&mut cb_data) })
+}
+
+pub fn on_delay<F: FnOnce() -> () + Sized + 'static>(delay: u64, f: F) -> VpiCallbackHandle {
+    let mut f = Some(f);
+    on_delay_internal(delay, move || {
+        core::mem::take(&mut f).map(|f| f());
     })
+}
+
+pub fn get_time() -> u64 {
+    let mut t = vpi_user::t_vpi_time {
+        type_: vpiSimTime as i32,
+        ..Default::default()
+    };
+    unsafe { vpi_get_time(core::ptr::null_mut(), &mut t) };
+    let mut result = t.high as u64;
+    result <<= 32;
+    result |= t.low as u64;
+    result
+}
+
+pub fn finish() {
+    //TODO: vpi_user::vpiFinish
 }
 
 pub fn remove_cb(cb_handle: VpiCallbackHandle) {
