@@ -6,7 +6,7 @@ use proc_macro2::{self, Span};
 use quote::quote;
 use syn::{
     parse_macro_input, punctuated::Punctuated, token::Comma, FnArg, Ident, ItemFn, LitByteStr,
-    LitStr, PatType, Signature, Token,
+    LitStr, PatType, Signature,
 };
 
 fn arg_initialization_impl(arg: &FnArg, index: usize) -> proc_macro2::TokenStream {
@@ -81,7 +81,7 @@ pub fn vpi_module(attr: TokenStream, item: TokenStream) -> TokenStream {
             fn wrapper() -> vpi_export::Result<()> {
                 let module = unsafe { vpi_handle_by_name(#module_name_literal.as_ptr() as *mut ::core::ffi::c_char, ::core::ptr::null_mut()) };
                 if module.is_null() {
-                    return Err(vpi_export::VpiConversionError::NoModule(core::ffi::CStr::from_bytes_with_nul(#module_name_literal).unwrap()))
+                    return Err(vpi_export::VpiError::NoModule(core::ffi::CStr::from_bytes_with_nul(#module_name_literal).unwrap()))
                 }
                 //Safety: systfref is not null or dangling
                 let mut args_iter = unsafe { vpi_export::VpiIter::new(vpiNet as PLI_INT32, module) };

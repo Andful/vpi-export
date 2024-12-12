@@ -1,6 +1,6 @@
 use core::fmt::Write;
 
-use crate::{FromVpiHandle, IntoVpiHandle, VpiConversionError};
+use crate::{FromVpiHandle, RawHandle, StoreIntoVpiHandle, VpiError};
 
 ///Verilog bit vector type.
 #[derive(Clone)]
@@ -91,7 +91,7 @@ impl<const N: usize> FromVpiHandle for BitVector<N>
 where
     [(); (N - 1) / 32 + 1]:,
 {
-    unsafe fn from_vpi_handle(handle: vpi_user::vpiHandle) -> crate::Result<Self> {
+    unsafe fn from_vpi_handle(handle: RawHandle) -> crate::Result<Self> {
         use vpi_user;
         let mut value = vpi_user::t_vpi_value {
             format: vpi_user::vpiVectorVal as i32,
@@ -99,9 +99,9 @@ where
         };
 
         //Safety: correct use of ffi
-        let size = unsafe { vpi_user::vpi_get(vpi_user::vpiSize as i32, handle) } as usize;
+        let size = unsafe { vpi_user::vpi_get(vpi_user::vpiSize as i32, handle.as_ptr()) } as usize;
         if size != N {
-            return Err(VpiConversionError::BitVectorLengthMissMatch {
+            return Err(VpiError::BitVectorLengthMissMatch {
                 expected: N,
                 actual: size as usize,
             });
@@ -109,7 +109,7 @@ where
 
         //Safety: correct use of ffi function
         unsafe {
-            vpi_user::vpi_get_value(handle, &mut value as *mut vpi_user::t_vpi_value);
+            vpi_user::vpi_get_value(handle.as_ptr(), &mut value as *mut vpi_user::t_vpi_value);
         }
         let mut result = Self::default();
         for i in 0..result.0.len() {
@@ -120,11 +120,11 @@ where
     }
 }
 
-impl<const N: usize> IntoVpiHandle for BitVector<N>
+impl<const N: usize> StoreIntoVpiHandle for BitVector<N>
 where
     [(); (N - 1) / 32 + 1]:,
 {
-    unsafe fn into_vpi_handle(&self, handle: vpi_user::vpiHandle) -> crate::Result<()> {
+    unsafe fn store_into_vpi_handle(&self, handle: RawHandle) -> crate::Result<()> {
         use vpi_user;
         let mut value = vpi_user::t_vpi_value {
             format: vpi_user::vpiVectorVal as i32,
@@ -142,7 +142,7 @@ where
         value.value.vector = ret.as_mut_ptr();
 
         vpi_user::vpi_put_value(
-            handle,
+            handle.as_ptr(),
             &mut value as *mut vpi_user::t_vpi_value,
             core::ptr::null_mut(),
             vpi_user::vpiNoDelay as i32,

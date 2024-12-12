@@ -1,14 +1,14 @@
 use core::ops::{Deref, DerefMut};
 
-use crate::{FromVpiHandle, IntoVpiHandle};
+use crate::{FromVpiHandle, RawHandle, StoreIntoVpiHandle};
 
+#[derive(Clone)]
 ///Handle
 pub struct Handle<E>
 where
     E: FromVpiHandle,
 {
-    pub(crate) handle: crate::vpi_user::vpiHandle,
-    element: E,
+    pub(crate) handle: crate::RawHandle,
     pd: core::marker::PhantomData<E>,
 }
 
@@ -16,25 +16,26 @@ impl<E> Handle<E>
 where
     E: FromVpiHandle,
 {
-    ///Get reference
-    pub fn as_ref(&self) -> crate::Result<HandleRef<'_, E>> {
-        Ok(HandleRef(self))
+    ///Immutable borrow of wrapped value
+    pub fn borrow(&self) -> crate::Result<HandleRef<'_, E>> {
+        Ok(HandleRef(Default::default(), self.get_value()?))
     }
 
-    ///Get mutable reference
-    pub fn as_mut(&mut self) -> crate::Result<HandleMut<'_, E>>
+    ///Mutable borrow of wrapped value
+    pub fn borrow_mut(&mut self) -> crate::Result<HandleMut<'_, E>>
     where
-        E: IntoVpiHandle,
+        E: StoreIntoVpiHandle,
     {
-        Ok(HandleMut(self))
+        Ok(HandleMut(self, self.get_value()?))
     }
 
-    pub fn into_inner(self) -> E {
-        self.element
+    /// Consumes the [Handle], returning the wrapped value.
+    pub fn get_value(&self) -> crate::Result<E> {
+        unsafe { E::from_vpi_handle(self.handle) }
     }
 }
 
-pub struct HandleRef<'a, E>(&'a Handle<E>)
+pub struct HandleRef<'a, E>(core::marker::PhantomData<&'a ()>, E)
 where
     E: FromVpiHandle;
 
@@ -44,39 +45,39 @@ where
 {
     type Target = E;
     fn deref(&self) -> &Self::Target {
-        &self.0.element
+        &self.1
     }
 }
 
-pub struct HandleMut<'a, E>(&'a mut Handle<E>)
+pub struct HandleMut<'a, E>(&'a mut Handle<E>, E)
 where
-    E: FromVpiHandle + IntoVpiHandle;
+    E: FromVpiHandle + StoreIntoVpiHandle;
 
 impl<E> Deref for HandleMut<'_, E>
 where
-    E: FromVpiHandle + IntoVpiHandle,
+    E: FromVpiHandle + StoreIntoVpiHandle,
 {
     type Target = E;
     fn deref(&self) -> &Self::Target {
-        &self.0.element
+        &self.1
     }
 }
 
 impl<E> DerefMut for HandleMut<'_, E>
 where
-    E: FromVpiHandle + IntoVpiHandle,
+    E: FromVpiHandle + StoreIntoVpiHandle,
 {
     fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.0.element
+        &mut self.1
     }
 }
 
 impl<E> Drop for HandleMut<'_, E>
 where
-    E: FromVpiHandle + IntoVpiHandle,
+    E: FromVpiHandle + StoreIntoVpiHandle,
 {
     fn drop(&mut self) {
-        unsafe { IntoVpiHandle::into_vpi_handle(&self.0.element, self.0.handle) }.unwrap();
+        unsafe { StoreIntoVpiHandle::store_into_vpi_handle(&self.1, self.0.handle) }.unwrap();
     }
 }
 
@@ -86,10 +87,9 @@ impl<E> FromVpiHandle for Handle<E>
 where
     E: FromVpiHandle,
 {
-    unsafe fn from_vpi_handle(handle: vpi_user::vpiHandle) -> crate::Result<Self> {
+    unsafe fn from_vpi_handle(handle: RawHandle) -> crate::Result<Self> {
         Ok(Self {
             handle,
-            element: FromVpiHandle::from_vpi_handle(handle)?,
             pd: Default::default(),
         })
     }

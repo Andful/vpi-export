@@ -11,20 +11,19 @@ extern crate alloc;
 
 #[doc(hidden)]
 pub mod __hidden__;
-use core::{
-    ffi::{c_void, CStr},
-    ptr::null_mut,
-};
+use core::{ffi::CStr, ptr::NonNull};
 
 pub use vpi_user;
 mod bitvec;
+mod clk;
 mod handle;
 mod impls;
 mod vpi_iter;
 pub use bitvec::BitVector;
+pub use clk::Clk;
 pub use vpi_export_macro::{bitvec, vpi_module, vpi_task};
 pub use vpi_user::vpi_printf;
-use vpi_user::{t_cb_data, vpiSimTime, vpi_get_time};
+use vpi_user::{vpiSimTime, vpi_get_time};
 
 mod __private {
     pub trait Sealed {}
@@ -33,15 +32,21 @@ mod __private {
 pub use handle::Handle;
 pub use vpi_iter::VpiIter;
 
+/// Not null [vpi_user::vpiHandle]
+pub type RawHandle = NonNull<vpi_user::PLI_UINT32>;
+
+///Possible result of a vpi task
 pub trait VpiTaskResult: __private::Sealed {
+    ///Conversion into [VpiTaskResult]
     fn into_vpi_result(self) -> Result<()>;
 }
 
 ///Error due to conversion from verilog type to rust type
 #[derive(Debug)]
-pub enum VpiConversionError {
+pub enum VpiError {
     ///String conversion error from verilog to rust
     Utf8Error(core::str::Utf8Error),
+    ///Module was not found
     NoModule(&'static CStr),
     ///Vector length missmat
     BitVectorLengthMissMatch {
@@ -50,10 +55,12 @@ pub enum VpiConversionError {
         ///Obtained length
         actual: usize,
     },
+    ///Period too small
+    PeriodTooSmall,
 }
 
 ///Result to a conversion from verilog type to rust type
-pub type Result<T> = core::result::Result<T, VpiConversionError>;
+pub type Result<T> = core::result::Result<T, VpiError>;
 
 ///Conversion trait from verilog to rust
 pub trait FromVpiHandle: Sized {
@@ -61,16 +68,16 @@ pub trait FromVpiHandle: Sized {
     /// [crate::vpi_user::vpi_get_value] to obtain the value to convert.
     /// # Safety
     /// handle must NOT be dangling or null
-    unsafe fn from_vpi_handle(handle: vpi_user::vpiHandle) -> Result<Self>;
+    unsafe fn from_vpi_handle(handle: RawHandle) -> Result<Self>;
 }
 
 ///Conversion trait from rust to verilog
-pub trait IntoVpiHandle: Sized {
+pub trait StoreIntoVpiHandle: Sized {
     ///Conversion function from rust to verilog. In implementation, use the function
     /// [crate::vpi_user::vpi_put_value] to conver type to verilog.
     /// # Safety
     /// handle must NOT be dangling or null
-    unsafe fn into_vpi_handle(&self, handle: vpi_user::vpiHandle) -> Result<()>;
+    unsafe fn store_into_vpi_handle(&self, handle: RawHandle) -> Result<()>;
 }
 
 unsafe extern "C" fn cb(data: *mut vpi_user::t_cb_data) -> i32 {
@@ -83,15 +90,16 @@ unsafe extern "C" fn cb(data: *mut vpi_user::t_cb_data) -> i32 {
 
 struct CallbackData {
     raw_callback_pointer: *mut u8,
-    callback: *mut dyn FnMut() -> (),
+    callback: *mut dyn FnMut(),
     callback_layout: alloc::alloc::Layout,
 }
 
-pub struct VpiCallbackHandle(vpi_user::vpiHandle);
+///Callback handle wrapper
+pub struct VpiCallbackHandle(vpi_user::vpiHandle, *const CallbackData);
 
 ///Register callback
-pub fn on_value_change<E: FromVpiHandle, F: FnMut() -> () + Sized + 'static>(
-    value: &Handle<E>,
+pub fn on_value_change<E: FromVpiHandle, F: FnMut() + Sized + 'static>(
+    value: Handle<E>,
     f: F,
 ) -> VpiCallbackHandle {
     use alloc::alloc::{alloc, handle_alloc_error, Layout};
@@ -116,14 +124,14 @@ pub fn on_value_change<E: FromVpiHandle, F: FnMut() -> () + Sized + 'static>(
     let mut cb_data = vpi_user::t_cb_data {
         reason: vpi_user::cbValueChange as i32,
         cb_rtn: Some(cb),
-        obj: value.handle,
+        obj: value.handle.as_ptr(),
         user_data: data as *mut vpi_user::PLI_BYTE8,
         ..Default::default()
     };
-    VpiCallbackHandle(unsafe { vpi_user::vpi_register_cb(&mut cb_data) })
+    VpiCallbackHandle(unsafe { vpi_user::vpi_register_cb(&mut cb_data) }, data)
 }
 
-fn on_delay_internal<F: FnMut() -> () + Sized + 'static>(delay: u64, f: F) -> VpiCallbackHandle {
+fn on_delay_internal<F: FnMut() + Sized + 'static>(delay: u64, f: F) -> VpiCallbackHandle {
     use alloc::alloc::{alloc, handle_alloc_error, Layout};
     let callback_layout = Layout::new::<F>();
     let raw_callback_pointer = unsafe { alloc(callback_layout) };
@@ -156,16 +164,20 @@ fn on_delay_internal<F: FnMut() -> () + Sized + 'static>(delay: u64, f: F) -> Vp
         user_data: data as *mut vpi_user::PLI_BYTE8,
         ..Default::default()
     };
-    VpiCallbackHandle(unsafe { vpi_user::vpi_register_cb(&mut cb_data) })
+    VpiCallbackHandle(unsafe { vpi_user::vpi_register_cb(&mut cb_data) }, data)
 }
 
-pub fn on_delay<F: FnOnce() -> () + Sized + 'static>(delay: u64, f: F) -> VpiCallbackHandle {
+///Callback after delay
+pub fn on_delay<F: FnOnce() + Sized + 'static>(delay: u64, f: F) -> VpiCallbackHandle {
     let mut f = Some(f);
     on_delay_internal(delay, move || {
-        core::mem::take(&mut f).map(|f| f());
+        if let Some(f) = core::mem::take(&mut f) {
+            f();
+        }
     })
 }
 
+///Obtain simulation time
 pub fn get_time() -> u64 {
     let mut t = vpi_user::t_vpi_time {
         type_: vpiSimTime as i32,
@@ -178,13 +190,20 @@ pub fn get_time() -> u64 {
     result
 }
 
+/// Equivalent to $finish
 pub fn finish() {
-    //TODO: vpi_user::vpiFinish
+    unsafe {
+        vpi_user::vpi_control(vpi_user::vpiFinish as i32);
+    }
 }
 
+///Remove callback handle
 pub fn remove_cb(cb_handle: VpiCallbackHandle) {
     //TODO free data even though there does not seem to be a sensible way of doing it
     //Data is shared with the simulator
+    let a = unsafe { &*cb_handle.1 };
+    let _ = a.callback_layout;
+    let _ = a.raw_callback_pointer;
     unsafe { vpi_user::vpi_remove_cb(cb_handle.0) };
 }
 

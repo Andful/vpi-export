@@ -8,5 +8,10 @@ name = "bitvec"
 path = "src/bitvec.rs"
 crate-type = ["cdylib"]
 
+[[example]]
+name = "clk"
+path = "src/clk.rs"
+crate-type = ["cdylib"]
+
 [dependencies]
 vpi_export = { version = "0.1.5", path = "../vpi_export" }
