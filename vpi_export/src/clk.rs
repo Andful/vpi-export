@@ -1,6 +1,6 @@
 use crate::{on_delay, on_value_change, Handle, VpiCallbackHandle, VpiError};
 
-///Clock
+///Single bit logical value with clock utilities
 #[derive(Clone)]
 pub struct Clk {
     value: bool,

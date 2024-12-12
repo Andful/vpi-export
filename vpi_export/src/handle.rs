@@ -3,7 +3,7 @@ use core::ops::{Deref, DerefMut};
 use crate::{FromVpiHandle, RawHandle, StoreIntoVpiHandle};
 
 #[derive(Clone)]
-///Handle
+///Vpi handle type to interact with verilog values
 pub struct Handle<E>
 where
     E: FromVpiHandle,

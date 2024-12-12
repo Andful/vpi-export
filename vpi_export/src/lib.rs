@@ -41,8 +41,9 @@ pub trait VpiTaskResult: __private::Sealed {
     fn into_vpi_result(self) -> Result<()>;
 }
 
-///Error due to conversion from verilog type to rust type
+///Errors relating to VPI
 #[derive(Debug)]
+#[non_exhaustive]
 pub enum VpiError {
     ///String conversion error from verilog to rust
     Utf8Error(core::str::Utf8Error),
@@ -59,7 +60,7 @@ pub enum VpiError {
     PeriodTooSmall,
 }
 
-///Result to a conversion from verilog type to rust type
+///Result relating to a vpi result
 pub type Result<T> = core::result::Result<T, VpiError>;
 
 ///Conversion trait from verilog to rust
@@ -97,7 +98,7 @@ struct CallbackData {
 ///Callback handle wrapper
 pub struct VpiCallbackHandle(vpi_user::vpiHandle, *const CallbackData);
 
-///Register callback
+///Register callback for on value change
 pub fn on_value_change<E: FromVpiHandle, F: FnMut() + Sized + 'static>(
     value: Handle<E>,
     f: F,

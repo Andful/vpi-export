@@ -26,7 +26,7 @@ fn args_impl(args: &Punctuated<FnArg, Comma>) -> proc_macro2::TokenStream {
     quote! { #result }
 }
 
-/// Export function as a vpi task
+/// Drive signals of a module
 #[proc_macro_attribute]
 pub fn vpi_module(attr: TokenStream, item: TokenStream) -> TokenStream {
     let attr = attr.to_string();
