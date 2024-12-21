@@ -13,5 +13,10 @@ name = "clk"
 path = "src/clk.rs"
 crate-type = ["cdylib"]
 
+[[example]]
+name = "ghdl"
+path = "src/ghdl.rs"
+crate-type = ["cdylib"]
+
 [dependencies]
 vpi_export = { version = "0.1.5", path = "../vpi_export" }

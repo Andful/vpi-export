@@ -1,6 +1,6 @@
-use vpi_export::{finish, get_time, vpi_module, Clk, Handle};
+use vpi_export::{finish, get_time, vpi_top, Clk, Handle};
 
-#[vpi_module(main)]
+#[vpi_top]
 fn top(clk: Handle<Clk>) {
     Clk::on_posedge(clk.clone(), || {
         if get_time() >= 100000 {

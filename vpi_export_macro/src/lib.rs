@@ -28,6 +28,78 @@ fn args_impl(args: &Punctuated<FnArg, Comma>) -> proc_macro2::TokenStream {
 
 /// Drive signals of a module
 #[proc_macro_attribute]
+pub fn vpi_top(_: TokenStream, item: TokenStream) -> TokenStream {
+    let function = parse_macro_input!(item as ItemFn);
+    let ItemFn { sig, .. } = function.clone();
+    let Signature {
+        ident: fn_ident,
+        inputs,
+        ..
+    } = sig;
+    let args = args_impl(&inputs);
+    let args_initialization = inputs
+        .iter()
+        .enumerate()
+        .map(|(i, e)| arg_initialization_impl(e, i))
+        .collect::<Vec<_>>();
+
+    let register_fm = quote! {
+        const _: () = {
+            use ::vpi_export::__hidden__::{
+                ctor, VpiFunctionNode, VPI_FUNCTION_COLLECTION,
+            };
+            use ::vpi_export::vpi_user::*;
+
+            #[ctor]
+            fn ctor() {
+                static mut VPI_FUNCTION_NODE: VpiFunctionNode = VpiFunctionNode::new(init);
+                //SAFETY: this ctor function is called only once
+                VPI_FUNCTION_COLLECTION.push(unsafe {  &mut *::core::ptr::addr_of_mut!(VPI_FUNCTION_NODE) });
+            }
+
+            pub fn init() {
+                let mut cb_data = t_cb_data {
+                        reason: cbStartOfSimulation as i32,
+                        cb_rtn: Some(raw_wrapper),
+                        obj: core::ptr::null_mut(),
+                        user_data: core::ptr::null_mut(),
+                        ..Default::default()
+                    };
+
+                //SAFETY: correct usage of function
+                unsafe {
+                    vpi_export::vpi_user::vpi_register_cb(&mut cb_data);
+                }
+            }
+
+            fn wrapper() -> vpi_export::Result<()> {
+                let module = unsafe { vpi_export::VpiIter::new(vpiModule as PLI_INT32, core::ptr::null_mut()) }.next().unwrap();
+                //Safety: systfref is not null or dangling
+                let mut args_iter = unsafe { vpi_export::VpiIter::new(vpiNet as PLI_INT32, module.as_ptr()) };
+                {
+                    #(#args_initialization)*
+                    let res = #fn_ident(#args);
+                    vpi_export::VpiTaskResult::into_vpi_result(res)?
+                }
+                Ok(())
+            }
+
+            unsafe extern "C" fn raw_wrapper(_user_data: *mut vpi_export::vpi_user::t_cb_data) -> vpi_export::vpi_user::PLI_INT32 {
+                wrapper().unwrap();
+                0
+            }
+
+        };
+    };
+    quote! {
+        #register_fm
+        #function
+    }
+    .into()
+}
+
+/// Drive signals of a module
+#[proc_macro_attribute]
 pub fn vpi_module(attr: TokenStream, item: TokenStream) -> TokenStream {
     let attr = attr.to_string();
     let function = parse_macro_input!(item as ItemFn);

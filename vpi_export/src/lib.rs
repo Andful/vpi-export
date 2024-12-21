@@ -21,7 +21,7 @@ mod impls;
 mod vpi_iter;
 pub use bitvec::BitVector;
 pub use clk::Clk;
-pub use vpi_export_macro::{bitvec, vpi_module, vpi_task};
+pub use vpi_export_macro::{bitvec, vpi_module, vpi_task, vpi_top};
 pub use vpi_user::vpi_printf;
 use vpi_user::{vpiSimTime, vpi_get_time};
 
