@@ -19,6 +19,24 @@ fn arg_initialization_impl(arg: &FnArg, index: usize) -> proc_macro2::TokenStrea
     }
 }
 
+fn port_arg_initialization_impl(arg: &FnArg, index: usize) -> proc_macro2::TokenStream {
+    let arg_ident = Ident::new(&format!("arg_{index}"), Span::call_site());
+    match arg {
+        FnArg::Typed(PatType { ty, .. }) => quote! {
+            let port = args_iter.next().expect("Arg is null");
+            let name = unsafe {
+                vpi_get_str(vpi_export::vpi_user::vpiName as i32, port.as_ptr())
+            };
+            let net = unsafe {
+                vpi_export::vpi_user::vpi_handle_by_name(name, module.as_ptr())
+            };
+            let net = core::ptr::NonNull::new(net).expect("Low connection is null");
+            let #arg_ident = unsafe { <#ty as vpi_export::FromVpiHandle>::from_vpi_handle(net) }?;
+        },
+        _ => panic!("Only functions supported"),
+    }
+}
+
 fn args_impl(args: &Punctuated<FnArg, Comma>) -> proc_macro2::TokenStream {
     let result: Punctuated<Ident, Comma> = (0..args.len())
         .map(|i| Ident::new(&format!("arg_{i}"), Span::call_site()))
@@ -40,7 +58,7 @@ pub fn vpi_top(_: TokenStream, item: TokenStream) -> TokenStream {
     let args_initialization = inputs
         .iter()
         .enumerate()
-        .map(|(i, e)| arg_initialization_impl(e, i))
+        .map(|(i, e)| port_arg_initialization_impl(e, i))
         .collect::<Vec<_>>();
 
     let register_fm = quote! {
@@ -75,7 +93,7 @@ pub fn vpi_top(_: TokenStream, item: TokenStream) -> TokenStream {
             fn wrapper() -> vpi_export::Result<()> {
                 let module = unsafe { vpi_export::VpiIter::new(vpiModule as PLI_INT32, core::ptr::null_mut()) }.next().unwrap();
                 //Safety: systfref is not null or dangling
-                let mut args_iter = unsafe { vpi_export::VpiIter::new(vpiNet as PLI_INT32, module.as_ptr()) };
+                let mut args_iter = unsafe { vpi_export::VpiIter::new(vpiPort as PLI_INT32, module.as_ptr()) };
                 {
                     #(#args_initialization)*
                     let res = #fn_ident(#args);
@@ -117,7 +135,7 @@ pub fn vpi_module(attr: TokenStream, item: TokenStream) -> TokenStream {
     let args_initialization = inputs
         .iter()
         .enumerate()
-        .map(|(i, e)| arg_initialization_impl(e, i))
+        .map(|(i, e)| port_arg_initialization_impl(e, i))
         .collect::<Vec<_>>();
 
     let register_fm = quote! {
@@ -156,7 +174,7 @@ pub fn vpi_module(attr: TokenStream, item: TokenStream) -> TokenStream {
                     return Err(vpi_export::VpiError::NoModule(core::ffi::CStr::from_bytes_with_nul(#module_name_literal).unwrap()))
                 }
                 //Safety: systfref is not null or dangling
-                let mut args_iter = unsafe { vpi_export::VpiIter::new(vpiNet as PLI_INT32, module) };
+                let mut args_iter = unsafe { vpi_export::VpiIter::new(vpiPort as PLI_INT32, module) };
                 {
                     #(#args_initialization)*
                     let res = #fn_ident(#args);

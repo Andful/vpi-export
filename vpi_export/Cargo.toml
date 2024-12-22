@@ -14,7 +14,7 @@ categories = ["development-tools::ffi", "development-tools::debugging"]
 [dependencies]
 ctor = "0.2.9"
 vpi_user = "0.1.0"
-vpi_export_macro = "0.1.8"
+vpi_export_macro = { path = "../vpi_export_macro" }
 
 [build-dependencies]
 bindgen = "0.70.1"

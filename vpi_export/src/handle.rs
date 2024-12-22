@@ -1,4 +1,7 @@
-use core::ops::{Deref, DerefMut};
+use core::{
+    ffi::CStr,
+    ops::{Deref, DerefMut},
+};
 
 use crate::{FromVpiHandle, RawHandle, StoreIntoVpiHandle};
 
@@ -16,12 +19,12 @@ impl<E> Handle<E>
 where
     E: FromVpiHandle,
 {
-    ///Immutable borrow of wrapped value
+    /// Immutable borrow of wrapped value
     pub fn borrow(&self) -> crate::Result<HandleRef<'_, E>> {
         Ok(HandleRef(Default::default(), self.get_value()?))
     }
 
-    ///Mutable borrow of wrapped value
+    /// Mutable borrow of wrapped value
     pub fn borrow_mut(&mut self) -> crate::Result<HandleMut<'_, E>>
     where
         E: StoreIntoVpiHandle,
@@ -29,9 +32,24 @@ where
         Ok(HandleMut(self, self.get_value()?))
     }
 
+    /// Obtain underling raw handle
+    pub fn raw_handle(&self) -> RawHandle {
+        self.handle
+    }
+
     /// Consumes the [Handle], returning the wrapped value.
     pub fn get_value(&self) -> crate::Result<E> {
         unsafe { E::from_vpi_handle(self.handle) }
+    }
+
+    /// Get verilog name of handle
+    pub fn name(&self) -> crate::Result<&str> {
+        let data = unsafe { vpi_user::vpi_get_str(vpi_user::vpiName as i32, self.handle.as_ptr()) }
+            as *const i8;
+
+        unsafe { CStr::from_ptr(data) }
+            .to_str()
+            .map_err(crate::VpiError::Utf8Error)
     }
 }
 
