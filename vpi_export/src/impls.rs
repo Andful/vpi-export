@@ -42,21 +42,29 @@ impl_from_vpi_handle!(i8);
 impl_from_vpi_handle!(i16);
 impl_from_vpi_handle!(i32);
 impl_from_vpi_handle!(i64);
+impl_from_vpi_handle!(i128);
+impl_from_vpi_handle!(isize);
 
 impl_from_vpi_handle!(u8);
 impl_from_vpi_handle!(u16);
 impl_from_vpi_handle!(u32);
 impl_from_vpi_handle!(u64);
+impl_from_vpi_handle!(u128);
+impl_from_vpi_handle!(usize);
 
 impl_store_into_vpi_handle!(i8);
 impl_store_into_vpi_handle!(i16);
 impl_store_into_vpi_handle!(i32);
 impl_store_into_vpi_handle!(i64);
+impl_store_into_vpi_handle!(i128);
+impl_store_into_vpi_handle!(isize);
 
 impl_store_into_vpi_handle!(u8);
 impl_store_into_vpi_handle!(u16);
 impl_store_into_vpi_handle!(u32);
 impl_store_into_vpi_handle!(u64);
+impl_store_into_vpi_handle!(u128);
+impl_store_into_vpi_handle!(usize);
 
 impl StoreIntoVpiHandle for () {
     unsafe fn store_into_vpi_handle(&self, _handle: RawHandle) -> Result<()> {
@@ -129,5 +137,33 @@ impl __private::Sealed for Result<()> {}
 impl VpiTaskResult for Result<()> {
     fn into_vpi_result(self) -> Result<()> {
         self
+    }
+}
+
+impl FromVpiHandle for bool {
+    unsafe fn from_vpi_handle(handle: RawHandle) -> Result<Self> {
+        let mut value = vpi_user::t_vpi_value {
+            format: vpi_user::vpiIntVal as i32,
+            ..Default::default()
+        };
+        vpi_user::vpi_get_value(handle.as_ptr(), &mut value as *mut vpi_user::t_vpi_value);
+        Ok(unsafe { value.value.integer } > 0)
+    }
+}
+
+impl StoreIntoVpiHandle for bool {
+    unsafe fn store_into_vpi_handle(&self, handle: RawHandle) -> Result<()> {
+        let mut value = vpi_user::t_vpi_value {
+            format: vpi_user::vpiIntVal as i32,
+            ..Default::default()
+        };
+        value.value.integer = if *self { 1 } else { 0 };
+        vpi_user::vpi_put_value(
+            handle.as_ptr(),
+            &mut value as *mut vpi_user::t_vpi_value,
+            core::ptr::null_mut(),
+            vpi_user::vpiNoDelay as i32,
+        );
+        Ok(())
     }
 }

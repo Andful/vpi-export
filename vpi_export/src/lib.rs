@@ -218,5 +218,5 @@ pub fn print(c: &core::ffi::CStr) {
 ///Print function that internally will use the simulator's print function with an appended new line.
 pub fn println(c: &core::ffi::CStr) {
     print(c);
-    print(unsafe { core::ffi::CStr::from_bytes_with_nul_unchecked(b"\n\0") });
+    print(c"\n");
 }

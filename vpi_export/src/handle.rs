@@ -57,7 +57,7 @@ pub struct HandleRef<'a, E>(core::marker::PhantomData<&'a ()>, E)
 where
     E: FromVpiHandle;
 
-impl<'a, E> Deref for HandleRef<'a, E>
+impl<E> Deref for HandleRef<'_, E>
 where
     E: FromVpiHandle,
 {
