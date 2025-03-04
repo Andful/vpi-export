@@ -4,6 +4,11 @@ version = "0.1.0"
 edition = "2021"
 
 [[example]]
+name = "coroutine"
+path = "src/coroutine.rs"
+crate-type = ["cdylib"]
+
+[[example]]
 name = "bitvec"
 path = "src/bitvec.rs"
 crate-type = ["cdylib"]
