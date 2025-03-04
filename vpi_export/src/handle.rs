@@ -43,12 +43,17 @@ where
     }
 
     /// Get verilog name of handle
-    pub fn name(&self) -> crate::Result<&str> {
-        let data = unsafe { vpi_user::vpi_get_str(vpi_user::vpiName as i32, self.handle.as_ptr()) }
-            as *const i8;
+    pub fn raw_name(&self) -> *const core::ffi::c_char {
+        unsafe { vpi_user::vpi_get_str(vpi_user::vpiName as i32, self.handle.as_ptr()) }
+    }
 
-        unsafe { CStr::from_ptr(data) }
+    /// Get verilog name of handle
+    pub fn name(&self) -> crate::Result<alloc::string::String> {
+        use crate::alloc::string::ToString;
+
+        unsafe { CStr::from_ptr(self.raw_name()) }
             .to_str()
+            .map(|e| e.to_string())
             .map_err(crate::VpiError::Utf8Error)
     }
 }

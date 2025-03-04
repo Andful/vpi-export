@@ -14,4 +14,4 @@ path = "src/clk.rs"
 crate-type = ["cdylib"]
 
 [dependencies]
-vpi_export = { version = "0.1.5", path = "../vpi_export" }
+vpi_export = { version = "0.1.9", path = "../vpi_export" }
