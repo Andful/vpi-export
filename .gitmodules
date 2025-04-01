@@ -7,3 +7,6 @@
 [submodule "vpi_user/repos/iverilog"]
 	path = vpi_user/repos/iverilog
 	url = https://github.com/steveicarus/iverilog.git
+[submodule "vvp_sys/iverilog"]
+	path = vvp_sys/iverilog
+	url = https://github.com/steveicarus/iverilog.git

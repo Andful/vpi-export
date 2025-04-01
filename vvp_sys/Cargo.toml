@@ -1,0 +1,18 @@
+[package]
+name = "vvp_sys"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+description = "vpi_user.h"
+documentation = "https://docs.rs/libvvp"
+repository = "https://github.com/Andful/vpi-export"
+homepage = "https://github.com/Andful/vpi-export"
+keywords = ["no_std", "verilog", "vpi", "ffi", "fpga"]
+categories = ["development-tools::ffi", "development-tools::debugging"]
+
+[dependencies]
+
+
+[build-dependencies]
+bindgen = "0.70.1"
+copy_dir = "0.1.3"

@@ -13,11 +13,14 @@ extern crate alloc;
 pub mod __hidden__;
 use core::{ffi::CStr, ptr::NonNull};
 
+use alloc::borrow::Cow;
 pub use vpi_user;
 mod bitvec;
 mod clk;
 mod handle;
 mod impls;
+#[cfg(feature = "simulator")]
+pub mod simulator;
 mod vpi_iter;
 pub use bitvec::BitVector;
 pub use clk::Clk;
@@ -48,7 +51,7 @@ pub enum VpiError {
     ///String conversion error from verilog to rust
     Utf8Error(core::str::Utf8Error),
     ///Module was not found
-    NoModule(&'static CStr),
+    NoModule(Cow<'static, CStr>),
     ///Vector length missmat
     BitVectorLengthMissMatch {
         ///Expected length
