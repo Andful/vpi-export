@@ -13,8 +13,8 @@ categories = ["development-tools::ffi", "development-tools::debugging"]
 
 [dependencies]
 ctor = "0.2.9"
-vpi_user = "0.1.9"
-vpi_export_macro = { version = "0.1.9", path = "../vpi_export_macro" }
+vpi_user = "0.1.10"
+vpi_export_macro = "0.1.10"
 
 [build-dependencies]
 bindgen = "0.70.1"
